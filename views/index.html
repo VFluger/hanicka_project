@@ -7,5 +7,20 @@
   </head>
   <body>
     <h1>Hello World!!!</h1>
+    <form action="/login" method="post">
+      <label for="person">Person:</label>
+      <select name="person" id="person">
+        <option value="vojtik">Vojtik</option>
+        <option value="hanca">Hanca</option>
+      </select>
+      <label for="password">Password:</label>
+      <input type="password" name="password" id="password" />
+      <input type="submit" value="Submit" />
+    </form>
+    <h2>Compliment</h2>
+    <form action="/api/compliment" method="post">
+      <textarea name="complimentText" id="textareaCompliment"></textarea>
+      <input type="submit" value="Submit" />
+    </form>
   </body>
 </html>
