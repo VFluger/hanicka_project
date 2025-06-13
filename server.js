@@ -23,6 +23,6 @@ app.get("/", (req, res) => {
   res.status(201).sendFile(__dirname + "/views/index.html");
 });
 
-app.listen("8000", () => {
-  console.log("listening on port 8080");
+const server = app.listen(process.env.PORT || "8080", () => {
+  console.log(`listening on port ${server.address().port}`);
 });
