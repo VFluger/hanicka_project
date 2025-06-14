@@ -126,7 +126,7 @@ app.get("/logout", async (req, res) => {
 app.get("/api/compliment", async (req, res) => {
   const user = req.user;
   const lastCheckedOn = new Date(user.lastCheckedCompliment);
-  if (lastCheckedOn.getDate() === new Date().getDate() + 14) {
+  if (lastCheckedOn.getDate() === new Date().getDate()) {
     // Get compliment from today
     const complimentObj = await complimentModel.findById(
       user.dailyComplimentId
@@ -158,9 +158,10 @@ app.get("/api/compliment", async (req, res) => {
 });
 
 app.post("/api/compliment", async (req, res) => {
+  console.log(req.body);
   const user = req.user;
   const lastPostedOn = new Date(user.lastSendCompliment);
-  if (lastPostedOn.getDay() === new Date().getDay()) {
+  if (lastPostedOn.getDay() === new Date().getDay() + 14) {
     // Already posted today
     return res.send({
       error: "User already posted a compliment today",

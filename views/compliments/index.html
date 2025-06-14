@@ -22,7 +22,7 @@
     <section>
       <h1>Daily Compliments</h1>
       <p class="desc">
-        Read a daily romantic compliment from Vojtik to cheer up the day!
+        Read a daily romantic compliment from Vojtík to cheer up the day!
       </p>
       <div class="card">
         <span id="compliment">Loading...</span>
@@ -35,14 +35,41 @@
     <section>
       <h2 id="write-comp-heading">
         <i class="fa-solid fa-angle-down" style="margin-right: 10px"></i>Write a
-        compliment for Vojtik
+        compliment for Vojtík
       </h2>
       <div class="write-compliment-container">
-        <form action="/api/compliment" method="post">
-          <textarea name="text" id="text"></textarea>
+        <p class="desc">
+          Write a <strong>daily</strong> romantic, funny or freaky compliment
+          for Vojtíšek to read, laught or get butterflies in stomach from...
+        </p>
+        <form id="compliment-form" action="/api/compliment" method="post">
+          <div id="textarea-container">
+            <textarea
+              name="complimentText"
+              id="compliment-textarea"
+              placeholder="Type something great in here!"
+            ></textarea>
+          </div>
+          <div id="submit-btn-container">
+            <input type="submit" value="Send!" id="submit-btn" />
+            <span id="error-text"></span>
+          </div>
         </form>
       </div>
     </section>
+    <div id="popup-overlay"></div>
+    <div id="popup">
+      <p class="heading">Log in</p>
+      <p class="desc">Please log in before continuing...</p>
+      <p class="select-user">Select user:</p>
+      <button id="hanicka-btn" class="select-btn">Hanička</button>
+      <button id="vojtisek-btn" class="select-btn">Vojtíšek</button>
+      <p id="question"></p>
+      <form id="login-form" class="password-container">
+        <input type="password" name="password" id="password" />
+        <input type="submit" value="Send" id="submit-login" />
+      </form>
+    </div>
     <script src="/compliments/script.js"></script>
   </body>
 </html>

@@ -2,8 +2,10 @@
 
 :root {
   --bg-color: #212121;
+  --bg-light-color: #272727;
   --card-bg-color: rgba(255, 255, 240, 0.56);
   --card-bg-active-color: rgba(255, 153, 199, 0.56);
+  --submit-btn-color: rgb(29, 108, 255);
 }
 
 body {
@@ -24,7 +26,7 @@ h2 {
   width: 50%;
   min-height: 25vh;
   margin: 50px auto;
-  background-color: var(--card-bg-color);
+  background-color: var(--card-bg-active-color);
   color: black;
   display: flex;
   justify-content: center;
@@ -32,6 +34,10 @@ h2 {
   border-radius: 15px;
   box-shadow: 5px 5px 10px black;
   position: relative;
+}
+
+.card.reveal {
+  background-color: var(--card-bg-color) !important;
 }
 
 .card .heart {
@@ -87,10 +93,12 @@ h2 {
   font-family: "Edu NSW ACT Cursive";
   &::before {
     font-size: 2.2em;
+    font-family: sans;
     content: "„ ";
   }
   &::after {
     font-size: 2.2em;
+    font-family: sans;
     content: "“";
   }
 }
@@ -126,4 +134,148 @@ h2 i.rotate {
 .visible {
   visibility: visible;
   opacity: 1;
+}
+#textarea-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+textarea {
+  width: 50%;
+  font-size: 2em;
+  font-family: "Edu NSW ACT Cursive";
+  border-radius: 15px;
+  color: white;
+  background-color: var(--bg-light-color);
+  padding: 10px;
+  border: 1px solid grey;
+}
+
+#submit-btn-container {
+  margin-top: 25px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+#submit-btn {
+  font-size: 1.5em;
+  background-color: rgb(29, 108, 255);
+  color: white;
+  border-radius: 10px;
+  border: 0px;
+  font-family: "Rubik";
+  padding: 5px 10px;
+  transition: all 0.25s ease-in-out;
+  &:hover {
+    cursor: pointer;
+    scale: 1.2;
+    box-shadow: 5px 5px 10px black;
+  }
+}
+
+#submit-btn.error {
+  background-color: #ff5454cf !important;
+}
+
+.success {
+  background-color: rgb(0, 161, 0) !important;
+}
+
+#error-text {
+  margin-top: 20px;
+  padding: 5px 10px;
+  border-radius: 10px;
+  &.error {
+    background-color: var(--bg-light-color);
+    border: 1px solid #d54a4a;
+  }
+}
+/* popup CSS */
+#popup-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+}
+
+#popup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 350px;
+  padding: 20px;
+  background: var(--bg-light-color);
+  color: white;
+  border-radius: 10px;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+  box-shadow: 0 0 10px black;
+}
+
+#close-popup {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  cursor: pointer;
+  font-size: 1.5em;
+}
+
+.heading {
+  font-size: 2em;
+  text-align: center;
+  padding: 0;
+  margin: 0;
+}
+
+.select-user {
+  margin-top: 20px;
+}
+
+.select-btn {
+  background-color: var(--bg-color);
+  color: white;
+  border-radius: 10px;
+  border: 0;
+  cursor: pointer;
+  padding: 5px 10px;
+  transition: all 0.5s;
+  border: 1px solid #454545;
+  &:hover {
+    scale: 1.1;
+  }
+}
+
+.select-btn.selected {
+  background-color: #696969;
+}
+
+#password {
+  background-color: var(--bg-color);
+  font-size: 1.2em;
+  color: white;
+  border-radius: 10px;
+  padding: 2px 5px;
+  border: 1px solid #454545;
+}
+
+#submit-login {
+  background-color: var(--submit-btn-color);
+  border: 0;
+  border-radius: 10px;
+  color: white;
+  font-size: 1.15em;
+  padding: 2px 5px;
+  margin-left: 5px;
+  cursor: pointer;
+  transition: all 0.5s;
+  &:hover {
+    scale: 1.1;
+  }
 }
