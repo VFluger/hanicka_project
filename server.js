@@ -20,15 +20,15 @@ const sessionModel = mongoose.model("Session", {
 
 const userModel = mongoose.model("User", {
   person: { type: String, enum: ["vojtik", "hanca"] },
-  lastCheckedCompliment: String,
-  lastSendCompliment: String,
-  dailyCompliment: String,
+  lastCheckedCompliment: Number,
+  lastSendCompliment: Number,
+  dailyComplimentId: String,
 });
 
 const complimentModel = mongoose.model("Compliment", {
   personTo: { type: String, enum: ["vojtik", "hanca"] },
   text: String,
-  createdAt: String,
+  createdAt: Number,
 });
 
 // Basic middleware
@@ -69,14 +69,21 @@ app.post("/login", async (req, res) => {
 
     // Session token
     const token = crypto.randomBytes(64).toString("hex");
-    console.log(req.useragent);
     const sessionObj = new sessionModel({
       token,
       ip: req.ip,
       person: person,
       userAgent: req.headers["user-agent"],
     });
-    console.log(sessionObj);
+    if (req.cookies.sesstoken) {
+      //find in db
+      const oldSessInDb = await sessionModel.findOne({
+        token: req.cookies.sesstoken,
+      });
+      if (oldSessInDb) {
+        await sessionModel.findOneAndDelete({ _id: oldSessInDb["_id"] });
+      }
+    }
     const sessionObjInDb = await sessionObj.save();
     res.cookie("sesstoken", token, {
       maxAge: oneYear,
@@ -108,32 +115,41 @@ app.get("/logout", async (req, res) => {
 
 app.get("/api/compliment", async (req, res) => {
   const user = req.user;
-  const lastCheckedOn = new Date(Number(user.lastCheckedCompliment));
-  if (lastCheckedOn.getDay() === new Date().getDay()) {
+  const lastCheckedOn = new Date(user.lastCheckedCompliment);
+  if (lastCheckedOn.getDate() === new Date().getDate() + 14) {
     // Get compliment from today
+    const complimentObj = await complimentModel.findById(
+      user.dailyComplimentId
+    );
+    console.log(complimentObj);
     return res.send({
       success: true,
-      compliment: user.dailyCompliment,
+      compliment: complimentObj,
+      alreadySeen: true,
     });
   }
   // Generate a new compliment
 
   //Get all compliments for the correct person
   const compliments = await complimentModel.find({ personTo: user.person });
+  // Remove yesterdays compliment
+  const filteredCompliments = compliments.filter(
+    (el) => !el._id.equals(new mongoose.Types.ObjectId(user.dailyComplimentId))
+  );
   //Get random one
   const randomCompliment =
-    compliments[Math.floor(Math.random() * compliments.length)];
+    filteredCompliments[Math.floor(Math.random() * filteredCompliments.length)];
   //asign it into the user obj and change lastCheckedCompliment value
-  user.dailyCompliment = randomCompliment.text;
+  user.dailyComplimentId = randomCompliment["_id"];
   user.lastCheckedCompliment = Date.now();
   await user.save();
 
-  res.send({ success: true, compliment: randomCompliment.text });
+  res.send({ success: true, compliment: randomCompliment });
 });
 
 app.post("/api/compliment", async (req, res) => {
   const user = req.user;
-  const lastPostedOn = new Date(Number(user.lastSendCompliment));
+  const lastPostedOn = new Date(user.lastSendCompliment);
   if (lastPostedOn.getDay() === new Date().getDay()) {
     // Already posted today
     return res.send({
