@@ -148,3 +148,25 @@ $("#login-form").submit(function (e) {
       handleFail(error);
     });
 });
+
+//IMPORTANT: With load update reactions correctly
+
+$(".reaction-btn").click(function () {
+  if ($(this).hasClass("active")) {
+    $(this).removeClass("active");
+    // remove reaction from server
+  }
+  $(this).addClass("active");
+  // add reaction to server
+});
+
+$(".reaction-btn").mouseenter(function () {
+  if ($(".reaction-btn.active").length > 0) {
+    return;
+  }
+  $(this).addClass("hover");
+});
+
+$(".reaction-btn").mouseleave(function () {
+  $(this).removeClass("hover");
+});

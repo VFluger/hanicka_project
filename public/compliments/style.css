@@ -80,6 +80,31 @@ h2 {
   transition-delay: 200ms;
 }
 
+.reaction-btn-container {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: var(--bg-color);
+  border-radius: 15px;
+}
+
+.reaction-btn {
+  background-color: transparent;
+  border: 0;
+  cursor: pointer;
+  font-size: 1.2em;
+  filter: grayscale(100%);
+  transition: all 0.2s;
+}
+
+.reaction-btn.hover {
+  filter: grayscale(0%);
+}
+
+.reaction-btn.active {
+  filter: grayscale(0%) !important;
+}
+
 .card span {
   font-size: 2em;
   text-align: center;
