@@ -14,6 +14,7 @@ body {
   background-color: var(--bg-color);
   color: white;
   font-family: "Rubik", sans-serif;
+  overflow-x: hidden;
 }
 
 h1,
@@ -22,9 +23,15 @@ h2 {
   text-align: center;
 }
 
+.desc {
+  max-width: 80%;
+  margin: 10px auto;
+}
+
 .card {
   width: 50%;
   min-height: 25vh;
+  max-width: 850px;
   margin: 50px auto;
   background-color: var(--card-bg-active-color);
   color: black;
@@ -107,6 +114,7 @@ h2 {
 
 .card span {
   font-size: 2em;
+  width: 100%;
   text-align: center;
   margin: 20px;
   transition: all 0.5s ease-in-out;
@@ -174,6 +182,7 @@ textarea {
   background-color: var(--bg-light-color);
   padding: 10px;
   border: 1px solid grey;
+  margin-top: 20px;
 }
 
 #submit-btn-container {
@@ -302,5 +311,17 @@ textarea {
   transition: all 0.5s;
   &:hover {
     scale: 1.1;
+  }
+}
+
+@media (max-width: 850px) {
+  .card {
+    width: 85%;
+  }
+  textarea {
+    width: 85%;
+  }
+  .reaction-btn-container {
+    font-size: 1.3em;
   }
 }
