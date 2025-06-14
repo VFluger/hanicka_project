@@ -5,6 +5,7 @@ const crypto = require("crypto");
 require("dotenv").config();
 const cookieParser = require("cookie-parser");
 const rateLimit = require("express-rate-limit");
+const { cp } = require("fs");
 
 const app = Express();
 
@@ -29,6 +30,7 @@ const complimentModel = mongoose.model("Compliment", {
   personTo: { type: String, enum: ["vojtik", "hanca"] },
   text: String,
   createdAt: Number,
+  reaction: String,
 });
 
 // Basic middleware
@@ -169,6 +171,43 @@ app.post("/api/compliment", async (req, res) => {
   user.lastSendCompliment = Date.now();
   await user.save();
   res.send({ success: true });
+});
+
+//Reactions
+
+app.get("/api/compliment/reaction", async (req, res) => {
+  //get compliment by id
+  const compliment = await complimentModel.findById(req.query.complimentId);
+  //return reaction
+  return res.send({ success: true, reaction: compliment.reaction });
+});
+
+app.post("/api/compliment/reaction", async (req, res) => {
+  const { complimentId, reaction } = req.body;
+  //get compliment by id
+  const compliment = await complimentModel.findById(complimentId);
+  console.log(compliment);
+  let hasAlreadyReaction = false;
+  //if reaction present, replace
+  if (compliment.reaction) {
+    hasAlreadyReaction = true;
+  }
+  compliment.reaction = reaction;
+  await compliment.save();
+  //return success and if replaced
+  return res.send({ success: true, reaction, hasAlreadyReaction });
+});
+
+app.delete("/api/compliment/reaction", async (req, res) => {
+  const { complimentId } = req.body;
+  //get compliment by id
+  const compliment = await complimentModel.findById(complimentId);
+  //delete reaction if present
+  if (compliment.reaction) {
+    compliment.reaction = "";
+    return res.send({ success: true, reaction: compliment.reaction });
+  }
+  res.send({ error: "No reaction on this compliment" });
 });
 
 const server = app.listen(process.env.PORT || "8080", () => {
