@@ -33,6 +33,12 @@ const complimentModel = mongoose.model("Compliment", {
   reaction: String,
 });
 
+const openCardModel = mongoose.model("openCard", {
+  heading: { type: String, unique: true, required: true },
+  text: { type: String, required: true },
+  seen: { type: Boolean, default: false },
+});
+
 // Basic middleware
 app.use((req, res, next) => {
   console.log(`${req.method} ON ${req.url}`);
@@ -208,6 +214,21 @@ app.delete("/api/compliment/reaction", async (req, res) => {
     return res.send({ success: true, reaction: compliment.reaction });
   }
   res.send({ error: "No reaction on this compliment" });
+});
+
+//OPEN WHEN CARDS
+app.get("/api/all-cards", async (req, res) => {
+  // Get all cards from db
+  const cards = await openCardModel.find().lean();
+  cards.forEach((el) => delete el["text"]);
+  // Return headings and seen
+  return res.send({ success: true, cards });
+});
+
+app.get("/api/card", async (req, res) => {
+  //Get all info of the card
+  const card = await openCardModel.findById(req.body.cardId);
+  return res.send({ success: true, card });
 });
 
 const server = app.listen(process.env.PORT || "8080", () => {
