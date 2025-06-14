@@ -124,7 +124,7 @@ app.get("/logout", async (req, res) => {
 app.get("/api/compliment", async (req, res) => {
   const user = req.user;
   const lastCheckedOn = new Date(user.lastCheckedCompliment);
-  if (lastCheckedOn.getDate() === new Date().getDate() + 14) {
+  if (lastCheckedOn.getDate() === new Date().getDate()) {
     // Get compliment from today
     const complimentObj = await complimentModel.findById(
       user.dailyComplimentId
