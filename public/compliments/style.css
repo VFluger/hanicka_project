@@ -1,0 +1,129 @@
+@import url("https://fonts.googleapis.com/css2?family=Edu+NSW+ACT+Cursive:wght@400..700&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap");
+
+:root {
+  --bg-color: #212121;
+  --card-bg-color: rgba(255, 255, 240, 0.56);
+  --card-bg-active-color: rgba(255, 153, 199, 0.56);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-color);
+  color: white;
+  font-family: "Rubik", sans-serif;
+}
+
+h1,
+.desc,
+h2 {
+  text-align: center;
+}
+
+.card {
+  width: 50%;
+  min-height: 25vh;
+  margin: 50px auto;
+  background-color: var(--card-bg-color);
+  color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 15px;
+  box-shadow: 5px 5px 10px black;
+  position: relative;
+}
+
+.card .heart {
+  position: absolute;
+  font-size: 2rem;
+  opacity: 0;
+  transition: 2s ease-in-out;
+}
+
+.card span.reveal {
+  cursor: pointer;
+}
+
+.card.reveal-animate .heart {
+  opacity: 1;
+  font-size: 1em;
+}
+
+.heart1 {
+  top: 5%;
+  left: 5%;
+  transition-delay: 50ms;
+}
+
+.heart2 {
+  top: 58%;
+  left: 12%;
+  transition-delay: 100ms;
+}
+
+.heart3 {
+  top: 40%;
+  right: 12%;
+  transition-delay: 150ms;
+}
+
+.heart4 {
+  top: 10%;
+  right: 28%;
+  transition-delay: 200ms;
+}
+
+.card span {
+  font-size: 2em;
+  text-align: center;
+  margin: 20px;
+  transition: all 0.5s ease-in-out;
+}
+
+.card span.text {
+  font-size: 2em !important;
+  color: black !important;
+  font-family: "Edu NSW ACT Cursive";
+  &::before {
+    font-size: 2.2em;
+    content: "„ ";
+  }
+  &::after {
+    font-size: 2.2em;
+    content: "“";
+  }
+}
+
+.card.reveal-animate {
+  background-color: var(--card-bg-active-color);
+  transition: all 1s ease-in-out;
+}
+
+.card.reveal-animate span {
+  font-size: 0.5em;
+  color: rgba(255, 255, 255, 0);
+}
+
+h2 {
+  cursor: pointer;
+}
+
+h2 i {
+  transition: rotate 0.5s;
+}
+
+h2 i.rotate {
+  rotate: 180deg;
+}
+
+.write-compliment-container {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+.visible {
+  visibility: visible;
+  opacity: 1;
+}

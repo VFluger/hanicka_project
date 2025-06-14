@@ -56,7 +56,9 @@ app.use("/api", async (req, res, next) => {
   const token = req.cookies.sesstoken;
   const sessionInDb = await sessionModel.findOne({ token });
   if (!sessionInDb) {
-    return res.redirect("/login");
+    return res
+      .status(400)
+      .send({ error: "User not logged in", isLoggedIn: false });
   }
   req.person = sessionInDb.person;
   const userObj = await userModel.findOne({ person: req.person });
@@ -124,7 +126,7 @@ app.get("/logout", async (req, res) => {
 app.get("/api/compliment", async (req, res) => {
   const user = req.user;
   const lastCheckedOn = new Date(user.lastCheckedCompliment);
-  if (lastCheckedOn.getDate() === new Date().getDate()) {
+  if (lastCheckedOn.getDate() === new Date().getDate() + 14) {
     // Get compliment from today
     const complimentObj = await complimentModel.findById(
       user.dailyComplimentId
