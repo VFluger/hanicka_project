@@ -1,14 +1,23 @@
 // Get compliment from server
+let currectCompliment;
 const getCompliment = () => {
   $.get("/api/compliment")
     .done((data) => {
-      console.log(data);
+      currectCompliment = data.compliment;
 
       if (data.isLoggedIn) {
-        console.log("you need to log in");
         $("#popup-overlay, #popup").fadeIn(200);
         return;
       }
+
+      $.get("/api/compliment/reaction", {
+        complimentId: currectCompliment._id,
+      }).done((data) => {
+        if (!data.success) {
+          return console.error(data);
+        }
+        $(`#${data.reaction}`).addClass("active");
+      });
 
       if (!data.success) {
         $("#compliment").text(`ERROR: ${data.error}`);
@@ -152,12 +161,38 @@ $("#login-form").submit(function (e) {
 //IMPORTANT: With load update reactions correctly
 
 $(".reaction-btn").click(function () {
+  const formData = `complimentId=${currectCompliment._id}&reaction=${$(
+    this
+  ).attr("id")}`;
+
   if ($(this).hasClass("active")) {
     $(this).removeClass("active");
     // remove reaction from server
+    return $.ajax({
+      url: "/api/compliment/reaction",
+      method: "DELETE",
+      contentType: "application/x-www-form-urlencoded",
+      data: formData,
+    })
+      .done((data) => {
+        console.log("reaction removed successfully");
+      })
+      .fail((err) => {
+        console.error(err);
+        $(this).addClass("active");
+      });
   }
+
+  $(".reaction-btn").removeClass("active");
   $(this).addClass("active");
   // add reaction to server
+  $.post("/api/compliment/reaction", formData)
+    .done((data) => {
+      console.log(data);
+    })
+    .fail((err) => {
+      $(this).removeClass("active");
+    });
 });
 
 $(".reaction-btn").mouseenter(function () {

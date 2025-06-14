@@ -202,7 +202,11 @@ app.post("/api/compliment/reaction", async (req, res) => {
     hasAlreadyReaction = true;
   }
   compliment.reaction = reaction;
-  await compliment.save();
+  try {
+    await compliment.save();
+  } catch (err) {
+    res.status(500).send({ error: err });
+  }
   //return success and if replaced
   return res.send({ success: true, reaction, hasAlreadyReaction });
 });
