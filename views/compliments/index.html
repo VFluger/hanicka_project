@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Compliments</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/compliments/style.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script
+      src="https://kit.fontawesome.com/9dc89b769e.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <section>
+      <h1>Daily Compliments</h1>
+      <p class="desc">
+        Read a daily romantic compliment from Vojtik to cheer up the day!
+      </p>
+      <div class="card">
+        <span id="compliment">Loading...</span>
+        <span class="heart heart1">❤️</span>
+        <span class="heart heart2">❤️</span>
+        <span class="heart heart3">❤️</span>
+        <span class="heart heart4">❤️</span>
+      </div>
+    </section>
+    <section>
+      <h2 id="write-comp-heading">
+        <i class="fa-solid fa-angle-down" style="margin-right: 10px"></i>Write a
+        compliment for Vojtik
+      </h2>
+      <div class="write-compliment-container">
+        <form action="/api/compliment" method="post">
+          <textarea name="text" id="text"></textarea>
+        </form>
+      </div>
+    </section>
+    <script src="/compliments/script.js"></script>
+  </body>
+</html>
