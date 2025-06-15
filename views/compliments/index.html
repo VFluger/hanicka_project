@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Compliments</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="/popup.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script
+      src="https://kit.fontawesome.com/9dc89b769e.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <section>
+      <h1>Daily Compliments</h1>
+      <p class="desc">
+        Read a daily romantic compliment from Vojtík to cheer up the day!
+      </p>
+      <div class="card">
+        <span id="compliment">Loading...</span>
+        <span class="heart heart1">❤️</span>
+        <span class="heart heart2">❤️</span>
+        <span class="heart heart3">❤️</span>
+        <span class="heart heart4">❤️</span>
+        <div class="reaction-btn-container">
+          <button id="heart" class="reaction-btn">❤️</button>
+          <button id="whale" class="reaction-btn">🐋</button>
+          <button id="heart-face" class="reaction-btn">🥹</button>
+        </div>
+      </div>
+    </section>
+    <section>
+      <h2 id="write-comp-heading">
+        <i class="fa-solid fa-angle-down" style="margin-right: 10px"></i>Write a
+        compliment for Vojtík
+      </h2>
+      <div class="write-compliment-container">
+        <p class="desc">
+          Write a <strong>daily</strong> romantic, funny or freaky compliment
+          for Vojtíšek to read, laught or get butterflies in stomach from...
+        </p>
+        <form id="compliment-form" action="/api/compliment" method="post">
+          <div id="textarea-container">
+            <textarea
+              name="complimentText"
+              id="compliment-textarea"
+              placeholder="Type something great in here!"
+            ></textarea>
+          </div>
+          <div id="submit-btn-container">
+            <input type="submit" value="Send!" id="submit-btn" />
+            <span id="error-text"></span>
+          </div>
+        </form>
+      </div>
+    </section>
+    <div id="popup-overlay"></div>
+    <div id="popup">
+      <p class="heading">Log in</p>
+      <p class="desc">Please log in before continuing...</p>
+      <p class="select-user">Select user:</p>
+      <button id="hanicka-btn" class="select-btn">Hanička</button>
+      <button id="vojtisek-btn" class="select-btn">Vojtíšek</button>
+      <p id="question"></p>
+      <form id="login-form" class="password-container">
+        <input type="password" name="password" id="password" />
+        <input type="submit" value="Send" id="submit-login" />
+      </form>
+    </div>
+    <script src="/popup.js"></script>
+    <script src="/compliments/script.js"></script>
+  </body>
+</html>

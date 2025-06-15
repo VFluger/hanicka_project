@@ -1,0 +1,219 @@
+@import url("https://fonts.googleapis.com/css2?family=Edu+NSW+ACT+Cursive:wght@400..700&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap");
+
+:root {
+  --bg-color: #212121;
+  --bg-light-color: #272727;
+  --card-bg-color: rgba(255, 255, 240, 0.56);
+  --card-bg-active-color: rgba(255, 153, 199, 0.56);
+  --submit-btn-color: rgb(29, 108, 255);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-color);
+  color: white;
+  font-family: "Rubik", sans-serif;
+}
+
+h1,
+.desc,
+h2 {
+  text-align: center;
+}
+
+.card {
+  width: 50%;
+  min-height: 25vh;
+  margin: 50px auto;
+  background-color: var(--card-bg-active-color);
+  color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 15px;
+  box-shadow: 5px 5px 10px black;
+  position: relative;
+}
+
+.card.reveal {
+  background-color: var(--card-bg-color) !important;
+}
+
+.card .heart {
+  position: absolute;
+  font-size: 2rem;
+  opacity: 0;
+  transition: 2s ease-in-out;
+}
+
+.card span.reveal {
+  cursor: pointer;
+}
+
+.card.reveal-animate .heart {
+  opacity: 1;
+  font-size: 1em;
+}
+
+.heart1 {
+  top: 5%;
+  left: 5%;
+  transition-delay: 50ms;
+}
+
+.heart2 {
+  top: 58%;
+  left: 12%;
+  transition-delay: 100ms;
+}
+
+.heart3 {
+  top: 40%;
+  right: 12%;
+  transition-delay: 150ms;
+}
+
+.heart4 {
+  top: 10%;
+  right: 28%;
+  transition-delay: 200ms;
+}
+
+.reaction-btn-container {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: var(--bg-color);
+  border-radius: 15px;
+}
+
+.reaction-btn {
+  background-color: transparent;
+  border: 0;
+  cursor: pointer;
+  font-size: 1.2em;
+  filter: grayscale(100%);
+  transition: all 0.2s;
+}
+
+.reaction-btn.hover {
+  filter: grayscale(0%);
+}
+
+.reaction-btn.active {
+  filter: grayscale(0%) !important;
+}
+
+.card span {
+  font-size: 2em;
+  text-align: center;
+  margin: 20px;
+  transition: all 0.5s ease-in-out;
+}
+
+.card span.text {
+  font-size: 2em !important;
+  color: black !important;
+  font-family: "Edu NSW ACT Cursive";
+  &::before {
+    font-size: 2.2em;
+    font-family: sans;
+    content: "„ ";
+  }
+  &::after {
+    font-size: 2.2em;
+    font-family: sans;
+    content: "“";
+  }
+}
+
+.card.reveal-animate {
+  background-color: var(--card-bg-active-color);
+  transition: all 1s ease-in-out;
+}
+
+.card.reveal-animate span {
+  font-size: 0.5em;
+  color: rgba(255, 255, 255, 0);
+}
+
+h2 {
+  cursor: pointer;
+}
+
+h2 i {
+  transition: rotate 0.5s;
+}
+
+h2 i.rotate {
+  rotate: 180deg;
+}
+
+.write-compliment-container {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+.visible {
+  visibility: visible;
+  opacity: 1;
+}
+#textarea-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+textarea {
+  width: 50%;
+  font-size: 2em;
+  font-family: "Edu NSW ACT Cursive";
+  border-radius: 15px;
+  color: white;
+  background-color: var(--bg-light-color);
+  padding: 10px;
+  border: 1px solid grey;
+}
+
+#submit-btn-container {
+  margin-top: 25px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+#submit-btn {
+  font-size: 1.5em;
+  background-color: rgb(29, 108, 255);
+  color: white;
+  border-radius: 10px;
+  border: 0px;
+  font-family: "Rubik";
+  padding: 5px 10px;
+  transition: all 0.25s ease-in-out;
+  &:hover {
+    cursor: pointer;
+    scale: 1.2;
+    box-shadow: 5px 5px 10px black;
+  }
+}
+
+#submit-btn.error {
+  background-color: #ff5454cf !important;
+}
+
+.success {
+  background-color: rgb(0, 161, 0) !important;
+}
+
+#error-text {
+  margin-top: 20px;
+  padding: 5px 10px;
+  border-radius: 10px;
+  &.error {
+    background-color: var(--bg-light-color);
+    border: 1px solid #d54a4a;
+  }
+}

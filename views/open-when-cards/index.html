@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>4Hanička - Open When Cards</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="/popup.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script
+      src="https://kit.fontawesome.com/9dc89b769e.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <section>
+      <h1>Open When Cards</h1>
+      <p class="desc">
+        When feeling lonely, on the edge or just achieved something great, you
+        can read these cards crafted exactly for the situation.
+      </p>
+      <div class="cards-container"></div>
+      <div id="cards-overlay"></div>
+    </section>
+    <div id="popup-overlay"></div>
+    <div id="popup">
+      <p class="heading">Log in</p>
+      <p class="desc">Please log in before continuing...</p>
+      <p class="select-user">Select user:</p>
+      <button id="hanicka-btn" class="select-btn">Hanička</button>
+      <button id="vojtisek-btn" class="select-btn">Vojtíšek</button>
+      <p id="question"></p>
+      <form id="login-form" class="password-container">
+        <input type="password" name="password" id="password" />
+        <input type="submit" value="Send" id="submit-login" />
+      </form>
+    </div>
+    <script src="/popup.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
