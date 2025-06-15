@@ -227,7 +227,9 @@ app.get("/api/all-cards", async (req, res) => {
 
 app.get("/api/card", async (req, res) => {
   //Get all info of the card
-  const card = await openCardModel.findById(req.body.cardId);
+  const card = await openCardModel.findById(req.query.cardId);
+  card.seen = true;
+  card.save();
   return res.send({ success: true, card });
 });
 
