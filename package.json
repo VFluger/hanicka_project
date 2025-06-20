@@ -9,7 +9,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
@@ -17,5 +16,14 @@
     "express": "^5.1.0",
     "express-rate-limit": "^7.5.0",
     "mongoose": "^8.15.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VFluger/hanicka_project.git"
+  },
+  "bugs": {
+    "url": "https://github.com/VFluger/hanicka_project/issues"
+  },
+  "homepage": "https://github.com/VFluger/hanicka_project#readme",
+  "description": ""
 }
