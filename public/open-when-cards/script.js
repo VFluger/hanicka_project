@@ -20,8 +20,11 @@ const loadCards = () => {
       //Open card
       $(".card").click(function () {
         $(this).addClass("active");
+        const heading = $(this).find(".heading");
+        const textCard = $(this).find(".text-card");
+        textCard.text("Loading...");
         $("#cards-overlay").addClass("active");
-        $(this).find(".heading").addClass("hide");
+        heading.addClass("hide");
         //load data
         $.get("/api/card", { cardId: $(this).attr("id") }).done((data) => {
           console.log(data);
