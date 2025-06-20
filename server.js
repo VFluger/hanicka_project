@@ -39,6 +39,30 @@ const openCardModel = mongoose.model("openCard", {
   seen: { type: Boolean, default: false },
 });
 
+const petsModel = mongoose.model("VHPets", {
+  name: String,
+  hunger: { type: Number, default: 100, min: 0, max: 100 },
+  cuddleNeed: { type: Number, default: 100, min: 0, max: 100 },
+  playNeed: { type: Number, default: 100, min: 0, max: 100 },
+  lastHungerUpdate: { type: Number, default: Date.now },
+  lastCuddleUpdate: { type: Number, default: Date.now },
+  lastPlayUpdate: { type: Number, default: Date.now },
+});
+
+const usersHomeModel = mongoose.model("VHUsers", {
+  name: String,
+  hunger: { type: Number, default: 100, min: 0, max: 100 },
+  tiredness: { type: Number, default: 100, min: 0, max: 100 },
+  lastHungerUpdate: { type: Number, default: Date.now },
+  lastTirednessUpdate: { type: Number, default: Date.now },
+});
+
+const foodModel = mongoose.model("VHFood", {
+  name: { type: String, enum: ["bread", "pizza", "cake", "soup", "pasta"] },
+  hungerValue: { type: Number, default: 20, min: 0, max: 100 },
+  isForPets: { type: Boolean, default: true },
+});
+
 // Basic middleware
 app.use((req, res, next) => {
   console.log(`${req.method} ON ${req.url}`);
@@ -239,6 +263,18 @@ app.get("/api/card", async (req, res) => {
   card.save();
   return res.send({ success: true, card });
 });
+
+// VIRTUAL HOME
+
+//TODO
+// update fnc (update hunger and other stats)
+// /api/home/update
+
+// feed fnc
+// cuddle fnc
+// play fnc
+
+//activities: watch tv, make love, sleep, make food
 
 const server = app.listen(process.env.PORT || "8080", () => {
   console.log(`listening on port ${server.address().port}`);

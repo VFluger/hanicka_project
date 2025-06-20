@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hello World test</title>
+  </head>
+  <body>
+    <h1>Hello World!!!</h1>
+    <form action="/login" method="post">
+      <label for="person">Person:</label>
+      <select name="person" id="person">
+        <option value="vojtik">Vojtik</option>
+        <option value="hanca">Hanca</option>
+      </select>
+      <label for="password">Password:</label>
+      <input type="password" name="password" id="password" />
+      <input type="submit" value="Submit" />
+    </form>
+    <h2>Compliment</h2>
+    <form action="/api/compliment" method="post">
+      <textarea name="complimentText" id="textareaCompliment"></textarea>
+      <input type="submit" value="Submit" />
+    </form>
+    <h2>Reaction</h2>
+    <form action="/api/compliment/reaction" method="post">
+      <label for="compliment-id"></label>
+      <input type="text" name="complimentId" id="compliment-id" />
+      <select name="reaction" id="person">
+        <option value="heart">heart</option>
+        <option value="whale">whale</option>
+        <option value="heartFace">heartFace</option>
+        <input type="submit" value="submit" />
+      </select>
+    </form>
+    <h2>Delete reaction</h2>
+    <form action="/api/compliment/del-reaction" method="post">
+      <label for="compliment-id"></label>
+      <input type="text" name="complimentId" id="compliment-id" />
+      <input type="submit" value="submit" />
+    </form>
+  </body>
+</html>
