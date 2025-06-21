@@ -6,6 +6,7 @@ require("dotenv").config();
 const cookieParser = require("cookie-parser");
 const rateLimit = require("express-rate-limit");
 const { cp } = require("fs");
+const { time } = require("console");
 
 const app = Express();
 
@@ -41,7 +42,7 @@ const openCardModel = mongoose.model("openCard", {
 
 const petsModel = mongoose.model("VHPets", {
   name: String,
-  hunger: { type: Number, default: 100, min: 0, max: 100 },
+  hunger: { type: Number, default: 100, min: 0, max: 100 }, // More is better
   cuddleNeed: { type: Number, default: 100, min: 0, max: 100 }, // More is better
   playNeed: { type: Number, default: 100, min: 0, max: 100 }, // More is better
   lastHungerUpdate: { type: Number, default: Date.now },
@@ -52,9 +53,13 @@ const petsModel = mongoose.model("VHPets", {
 const usersHomeModel = mongoose.model("VHUsers", {
   name: String,
   hunger: { type: Number, default: 100, min: 0, max: 100 },
-  tiredness: { type: Number, default: 100, min: 0, max: 100 },
+  tiredness: { type: Number, default: 100, min: 0, max: 100 }, // Less is better
   lastHungerUpdate: { type: Number, default: Date.now },
   lastTirednessUpdate: { type: Number, default: Date.now },
+  isSleeping: { type: Boolean, default: false },
+  lastSleepStart: { type: Number, default: Date.now }, // When the user sleep is starting
+  lastSleepEnd: { type: Number }, // When the user sleep is ending
+  isKid: { type: Boolean, default: false }, // If true, user is kid (no real user)
 });
 
 const foodModel = mongoose.model("VHFood", {
@@ -269,6 +274,117 @@ app.get("/api/card", async (req, res) => {
 //TODO
 // update fnc (update hunger and other stats)
 // /api/home/update
+const updateHomeAndUser = async (req, res, next) => {
+  console.log(req.user);
+  if (req.user.person === "hanca") {
+    const userVH = await usersHomeModel.findOne({ name: "Hanča" });
+    console.log("UserVH: ", userVH);
+    req.userVH = userVH;
+  }
+  if (req.user.person === "vojtik") {
+    const userVH = await usersHomeModel.findOne({ name: "Vojtík" });
+    console.log("UserVH: ", userVH);
+    req.userVH = userVH;
+  }
+  // Get all pets and users
+  const pets = await petsModel.find();
+  const users = await usersHomeModel.find();
+  // Update hunger
+  pets.forEach((pet) => {
+    const timeSinceLastHungerUpdate = Math.floor(
+      (Date.now() - pet.lastHungerUpdate) / 600000
+    ); // in tens of minutes
+    const timeSinceLastCuddleUpdate = Math.floor(
+      (Date.now() - pet.lastCuddleUpdate) / 600000
+    ); // in tens of minutes
+    const timeSinceLastPlayUpdate = Math.floor(
+      (Date.now() - pet.lastPlayUpdate) / 600000
+    ); // in tens of minutes
+
+    if (timeSinceLastHungerUpdate > 0) {
+      console.log(`${pet.name} Hunger descrease: `, timeSinceLastHungerUpdate);
+      pet.hunger -= timeSinceLastHungerUpdate;
+      pet.lastHungerUpdate = Date.now();
+      if (pet.hunger < 0) {
+        pet.hunger = 0;
+      }
+    }
+    if (timeSinceLastCuddleUpdate > 0) {
+      console.log(
+        `${pet.name} CuddleNeed descrease: `,
+        timeSinceLastCuddleUpdate
+      );
+      pet.cuddleNeed -= timeSinceLastCuddleUpdate * 2; // 2% per 10 minutes
+      pet.lastCuddleUpdate = Date.now();
+      if (pet.cuddleNeed < 0) {
+        pet.cuddleNeed = 0;
+      }
+    }
+    if (timeSinceLastPlayUpdate > 0) {
+      console.log(`${pet.name} PlayNeed descrease: `, timeSinceLastPlayUpdate);
+      pet.playNeed -= timeSinceLastPlayUpdate * 2; // 2% per 10 minutes
+      pet.lastPlayUpdate = Date.now();
+      if (pet.playNeed < 0) {
+        pet.playNeed = 0;
+      }
+    }
+    // Save pet
+    pet.save();
+  });
+  // Update hunger and tiredness for users
+  users.forEach((user) => {
+    const timeSinceLastHungerUpdate = Math.floor(
+      (Date.now() - user.lastHungerUpdate) / 600000
+    ); // in tens of minutes
+    const timeSinceLastTirednessUpdate = Math.floor(
+      (Date.now() - user.lastTirednessUpdate) / 600000
+    ); // in tens of minutes
+
+    if (timeSinceLastHungerUpdate > 0) {
+      console.log(`${user.name} Hunger descrease: `, timeSinceLastHungerUpdate);
+      user.hunger -= timeSinceLastHungerUpdate;
+      user.lastHungerUpdate = Date.now();
+      if (user.hunger < 0) {
+        user.hunger = 0;
+      }
+    }
+    if (timeSinceLastTirednessUpdate > 0) {
+      console.log(
+        `${user.name} Tiredness increase: `,
+        timeSinceLastTirednessUpdate
+      );
+      user.tiredness += timeSinceLastTirednessUpdate;
+      user.lastTirednessUpdate = Date.now();
+      if (user.tiredness > 100) {
+        user.tiredness = 100;
+      }
+    }
+
+    // if user is sleeping, update tiredness
+    if (user.isSleeping) {
+      const sleepTime = Math.floor(
+        (Date.now() - user.lastSleepStart) / 60000 // in minutes
+      );
+      user.tiredness -= sleepTime; // 1% per minute
+      if (user.tiredness < 0) {
+        user.tiredness = 0;
+      }
+      // If sleep time is over, set isSleeping to false
+      // PUSH NOTIFICATION
+      if (Date.now() >= user.lastSleepEnd) {
+        user.isSleeping = false;
+        user.lastSleepStart = undefined;
+        user.lastSleepEnd = undefined;
+      }
+    }
+
+    // Save user
+    user.save();
+  });
+  next();
+};
+
+app.use("/api/home/", updateHomeAndUser);
 
 //Get pets, food, users
 app.get("/api/home/:objToGet", async (req, res) => {
@@ -291,6 +407,12 @@ app.get("/api/home/:objToGet", async (req, res) => {
 
 // feed fnc
 app.post("/api/home/feed", async (req, res) => {
+  if (req.userVH.isSleeping) {
+    return res.status(400).send({
+      error: "User is sleeping, cannot feed",
+      isSleeping: true,
+    });
+  }
   // foodId, petId, userId
   const { foodId, petId, userId } = req.body;
   //Cant have both petId and userId
@@ -334,6 +456,12 @@ app.post("/api/home/feed", async (req, res) => {
 });
 // cuddle and play fnc
 app.post("/api/home/:action", async (req, res) => {
+  if (req.userVH.isSleeping) {
+    return res.status(400).send({
+      error: "User is sleeping, cannot feed",
+      isSleeping: true,
+    });
+  }
   const { action } = req.params;
   const { petId } = req.body;
   // FInd pet in db
@@ -368,18 +496,156 @@ app.post("/api/home/:action", async (req, res) => {
 });
 
 //activities: watch tv, make love, sleep, make food
-app.post("/api/home/activity", async (req, res) => {
-  const { activity } = req.body;
+app.post("/api/home/activity/:activity", async (req, res) => {
+  const { activity } = req.params;
   // Sleeping: for random time (1-3 hours)
   // can be ended by user
   // no action allowed while in sleep
   // tiredness goes down by sleeping time in percentage (100min sleep = 1% per minute)
+  if (activity === "sleep") {
+    const { endSleep } = req.body;
+    if (endSleep) {
+      if (!req.userVH.isSleeping) {
+        return res.status(400).send({ error: "User is not sleeping" });
+      }
+      req.userVH.isSleeping = false;
+      req.userVH.lastSleepEnd = undefined;
+      req.userVH.lastSleepStart = undefined;
+      req.userVH.save();
+      return res.send({
+        success: true,
+        isSleeping: req.userVH.isSleeping,
+      });
+    }
+    if (req.userVH.isSleeping) {
+      //Already sleeping, return error
+      return res.status(400).send({ error: "User is already sleeping" });
+    }
+    const sleepTime = Math.floor(Math.random() * 120 + 60); // 60-180 minutes
+    req.userVH.isSleeping = true;
+    req.userVH.lastSleepStart = Date.now(); // in ms
+    req.userVH.lastSleepEnd = Date.now() + sleepTime * 60000; // in ms
+    req.userVH.save();
+    return res.send({
+      success: true,
+      sleepTime,
+      isSleeping: req.userVH.isSleeping,
+      lastSleepStart: req.userVH.lastSleepStart,
+      lastSleepEnd: req.userVH.lastSleepEnd,
+    });
+  }
 
-  // TV: instant action, can be done twice a day, tiredness goes down by 15%
+  if (req.userVH.isSleeping) {
+    return res.status(400).send({
+      error: "User is sleeping, cannot feed",
+      isSleeping: true,
+    });
+  }
+
+  // TV: instant action, tiredness goes down by 15%
+  if (activity === "tv") {
+    req.userVH.tiredness -= 15;
+    if (req.userVH.tiredness < 0) {
+      req.userVH.tiredness = 0;
+    }
+    await req.userVH.save();
+    return res.send({
+      success: true,
+      tiredness: req.userVH.tiredness,
+    });
+  }
 
   // Love: instant action, S.O. notified, random chance of no boner and pregnancy, tiredness goes up by 10%
+  if (activity === "love") {
+    if (Math.random() < 0.1) {
+      // 10% chance of no boner
+      return res.status(469).send({
+        error: "No boner, try again later",
+        isBoner: false,
+      });
+    }
+    if (Math.random() < 0.1) {
+      // 5% chance of pregnancy
+      // TODO: kids
+      const newKid = new usersHomeModel({
+        name: "Unnamed Kid",
+        isKid: true,
+      });
+      newKid.save();
+      req.userVH.tiredness += 10; // Increase tiredness
+      if (req.userVH.tiredness > 100) {
+        req.userVH.tiredness = 100;
+      }
+      await req.userVH.save();
+      return res.send({
+        success: true,
+        isPregnant: true,
+        tiredness: req.userVH.tiredness + 10,
+        newKidId: newKid._id,
+      });
+    }
+    // Normal love action
+    req.userVH.tiredness += 10;
+    if (req.userVH.tiredness > 100) {
+      req.userVH.tiredness = 100;
+    }
+    await req.userVH.save();
+    return res.send({
+      success: true,
+      tiredness: req.userVH.tiredness,
+      isBoner: true,
+    });
+  }
 
   // Food: instant action, user chooses food, tiredness linked to food type
+  if (activity === "food") {
+    // FOODS TO CHOOSE FROM: pizza, pasta, cake, twister, redbull
+    const foodValues = {
+      pizza: { hungerValue: 30, tirednessValue: 10, isForPets: true },
+      pasta: { hungerValue: 20, tirednessValue: 5, isForPets: true },
+      cake: { hungerValue: 25, tirednessValue: 8, isForPets: true },
+      twister: { hungerValue: 15, tirednessValue: 3, isForPets: false },
+      redbull: { hungerValue: 10, tirednessValue: -5, isForPets: false }, // Redbull gives energy
+    };
+    const { foodType } = req.body;
+    if (!foodValues[foodType]) {
+      return res.status(400).send({ error: "Invalid food type" });
+    }
+    req.userVH.tiredness += foodValues[foodType].tirednessValue;
+    if (req.userVH.tiredness > 100) {
+      req.userVH.tiredness = 100;
+    }
+    // Add food to db
+    const food = new foodModel({
+      name: foodType,
+      hungerValue: foodValues[foodType].hungerValue,
+      isForPets: foodValues[foodType].isForPets,
+    });
+    await food.save();
+    await req.userVH.save();
+    return res.send({
+      success: true,
+      hunger: req.userVH.hunger,
+      tiredness: req.userVH.tiredness,
+      foodType,
+    });
+  }
+});
+
+app.post("/api/home/kidName", async (req, res) => {
+  const { kidId, name } = req.body;
+  if (!kidId || !name) {
+    return res.status(400).send({ error: "Missing parameters" });
+  }
+  // Find kid in db
+  const kid = await usersHomeModel.findById(kidId);
+  if (!kid || !kid.isKid) {
+    return res.status(400).send({ error: "Kid not found" });
+  }
+  // Update name
+  kid.name = name;
+  await kid.save();
+  return res.send({ success: true, kid });
 });
 
 const server = app.listen(process.env.PORT || "8080", () => {
