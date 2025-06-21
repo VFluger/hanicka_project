@@ -39,5 +39,27 @@
       <input type="text" name="complimentId" id="compliment-id" />
       <input type="submit" value="submit" />
     </form>
+    <form action="/api/home/feed" method="post">
+      <h2>Feed</h2>
+      <label for="food-id">FoodId</label>
+      <input type="text" name="foodId" id="food-id" />
+      <label for="user-id">UserId</label>
+      <input type="text" name="userId" id="user-id" />
+      <label for="pet-id">petId</label>
+      <input type="text" name="petId" id="pet-id" />
+      <input type="submit" value="Submit" />
+    </form>
+    <form action="/api/home/cuddle" method="post">
+      <h2>Cuddle pet</h2>
+      <label for="pet-id">petId</label>
+      <input type="text" name="petId" id="pet-id" />
+      <input type="submit" value="Submit" />
+    </form>
+    <form action="/api/home/play" method="post">
+      <h2>Play with pet</h2>
+      <label for="pet-id">petId</label>
+      <input type="text" name="petId" id="pet-id" />
+      <input type="submit" value="Submit" />
+    </form>
   </body>
 </html>

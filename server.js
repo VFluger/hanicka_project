@@ -42,8 +42,8 @@ const openCardModel = mongoose.model("openCard", {
 const petsModel = mongoose.model("VHPets", {
   name: String,
   hunger: { type: Number, default: 100, min: 0, max: 100 },
-  cuddleNeed: { type: Number, default: 100, min: 0, max: 100 },
-  playNeed: { type: Number, default: 100, min: 0, max: 100 },
+  cuddleNeed: { type: Number, default: 100, min: 0, max: 100 }, // More is better
+  playNeed: { type: Number, default: 100, min: 0, max: 100 }, // More is better
   lastHungerUpdate: { type: Number, default: Date.now },
   lastCuddleUpdate: { type: Number, default: Date.now },
   lastPlayUpdate: { type: Number, default: Date.now },
@@ -270,11 +270,117 @@ app.get("/api/card", async (req, res) => {
 // update fnc (update hunger and other stats)
 // /api/home/update
 
+//Get pets, food, users
+app.get("/api/home/:objToGet", async (req, res) => {
+  const { objToGet } = req.params;
+  if (objToGet === "pets") {
+    // Get all pets
+    const pets = await petsModel.find().lean();
+    return res.send({ success: true, pets });
+  } else if (objToGet === "food") {
+    // Get all food
+    const food = await foodModel.find().lean();
+    return res.send({ success: true, food });
+  } else if (objToGet === "users") {
+    // Get all users
+    const users = await usersHomeModel.find().lean();
+    return res.send({ success: true, users });
+  }
+  return res.status(400).send({ error: "Invalid object to get" });
+});
+
 // feed fnc
-// cuddle fnc
-// play fnc
+app.post("/api/home/feed", async (req, res) => {
+  // foodId, petId, userId
+  const { foodId, petId, userId } = req.body;
+  //Cant have both petId and userId
+  if (!foodId || (!petId && !userId) || (petId && userId)) {
+    return res
+      .status(400)
+      .send({ error: "Missing parameters or both petId and userId present" });
+  }
+  // Find food in db
+  const food = await foodModel.findById(foodId);
+  if (!food) {
+    return res.status(400).send({ error: "Food not found" });
+  }
+  let objToFeed;
+  let overFed = false;
+  if (req.body.petId) {
+    // Feed pet
+    const pet = await petsModel.findById(petId);
+    objToFeed = pet;
+  } else {
+    // Feed user
+    const userHome = await usersHomeModel.findById(userId);
+    objToFeed = userHome;
+  }
+  if (!objToFeed) {
+    return res.status(400).send({ error: "Object to feed not found" });
+  }
+  // Update hunger
+  objToFeed.hunger += food.hungerValue;
+  if (objToFeed.hunger > 100) {
+    objToFeed.hunger = 100;
+    overFed = true;
+  }
+  // Update lastHungerUpdate
+  objToFeed.lastHungerUpdate = Date.now();
+  // Delete food from db
+  await foodModel.findByIdAndDelete(foodId);
+  // Save to db
+  await objToFeed.save();
+  return res.send({ success: true, hunger: objToFeed.hunger, overFed });
+});
+// cuddle and play fnc
+app.post("/api/home/:action", async (req, res) => {
+  const { action } = req.params;
+  const { petId } = req.body;
+  // FInd pet in db
+  const pet = await petsModel.findById(petId);
+  if (!pet) {
+    return res.status(400).send({ error: "Pet not found" });
+  }
+  // Update cuddle or play need
+  if (action === "cuddle") {
+    pet.cuddleNeed += Math.random() * 30 + 10;
+    if (pet.cuddleNeed > 100) {
+      pet.cuddleNeed = 100;
+    }
+    pet.lastCuddleUpdate = Date.now();
+  } else if (action === "play") {
+    pet.playNeed += Math.random() * 30 + 10;
+    if (pet.playNeed > 100) {
+      pet.playNeed = 100;
+    }
+    pet.lastPlayUpdate = Date.now();
+  } else {
+    return res.status(400).send({ error: "Invalid action" });
+  }
+
+  // Save to db
+  await pet.save();
+
+  return res.send({
+    success: true,
+    [action + "Need"]: pet[action + "Need"],
+  });
+});
 
 //activities: watch tv, make love, sleep, make food
+app.post("/api/home/activity", async (req, res) => {
+  const { activity } = req.body;
+  // Sleeping: for random time (1-3 hours)
+  // can be ended by user
+  // no action allowed while in sleep
+  // tiredness goes down by sleeping time in percentage (100min sleep = 1% per minute)
+
+  // TV: instant action, can be done twice a day, tiredness goes down by 15%
+
+  // Love: instant action, S.O. notified, random chance of no boner and pregnancy, tiredness goes up by 10%
+
+  // Food: instant action, user chooses food, tiredness linked to food type
+});
 
 const server = app.listen(process.env.PORT || "8080", () => {
   console.log(`listening on port ${server.address().port}`);
