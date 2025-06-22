@@ -1,4 +1,4 @@
-const loadCards = () => {
+const loadContent = () => {
   $.get("/api/all-cards")
     .done((data) => {
       console.log(data);
@@ -55,4 +55,4 @@ const loadCards = () => {
       $("#popup").text("Error, sorry");
     });
 };
-loadCards();
+loadContent();

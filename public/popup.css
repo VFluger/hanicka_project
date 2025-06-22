@@ -49,6 +49,8 @@
   background-color: var(--bg-color);
   color: white;
   border-radius: 10px;
+  font-size: 1.2rem;
+  font-family: "Jersey 10", sans-serif;
   border: 0;
   cursor: pointer;
   padding: 5px 10px;
@@ -80,6 +82,7 @@
   font-size: 1.15em;
   padding: 2px 5px;
   margin-left: 5px;
+  margin-top: 10px;
   cursor: pointer;
   transition: all 0.5s;
   &:hover {

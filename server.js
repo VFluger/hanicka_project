@@ -152,6 +152,13 @@ app.get("/logout", async (req, res) => {
   res.status(500).send({ error: "internal server error" });
 });
 
+app.get("/api/user", async (req, res) => {
+  return res.send({
+    success: true,
+    user: req.user,
+  });
+});
+
 app.get("/api/compliment", async (req, res) => {
   const user = req.user;
   const lastCheckedOn = new Date(user.lastCheckedCompliment);
@@ -393,14 +400,22 @@ app.get("/api/home/:objToGet", async (req, res) => {
     // Get all pets
     const pets = await petsModel.find().lean();
     return res.send({ success: true, pets });
-  } else if (objToGet === "food") {
+  }
+  if (objToGet === "food") {
     // Get all food
     const food = await foodModel.find().lean();
     return res.send({ success: true, food });
-  } else if (objToGet === "users") {
+  }
+  if (objToGet === "users") {
     // Get all users
     const users = await usersHomeModel.find().lean();
     return res.send({ success: true, users });
+  }
+  if (objToGet === "current-user") {
+    return res.send({
+      success: true,
+      user: req.userVH,
+    });
   }
   return res.status(400).send({ error: "Invalid object to get" });
 });
@@ -632,20 +647,20 @@ app.post("/api/home/activity/:activity", async (req, res) => {
   }
 });
 
-app.post("/api/home/kidName", async (req, res) => {
-  const { kidId, name } = req.body;
-  if (!kidId || !name) {
+app.post("/api/home/rename", async (req, res) => {
+  const { userId, name } = req.body;
+  if (!userId || !name) {
     return res.status(400).send({ error: "Missing parameters" });
   }
-  // Find kid in db
-  const kid = await usersHomeModel.findById(kidId);
-  if (!kid || !kid.isKid) {
-    return res.status(400).send({ error: "Kid not found" });
+  // Find user by id
+  const userToRename = await usersHomeModel.findById(userId);
+  if (!userToRename) {
+    return res.status(400).send({ error: "User not found" });
   }
   // Update name
-  kid.name = name;
-  await kid.save();
-  return res.send({ success: true, kid });
+  userToRename.name = name;
+  await userToRename.save();
+  return res.send({ success: true, userToRename });
 });
 
 const server = app.listen(process.env.PORT || "8080", () => {
