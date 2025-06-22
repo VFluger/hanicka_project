@@ -1,0 +1,83 @@
+@import url("https://fonts.googleapis.com/css2?family=Edu+NSW+ACT+Cursive:wght@400..700&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Jersey+10&display=swap");
+
+:root {
+  --bg-color: #212121;
+  --bg-light-color: #272727;
+  --bg-lighter-color: #323232;
+  --card-bg-color: rgba(255, 255, 240, 0.56);
+  --card-bg-active-color: rgba(255, 153, 199, 0.56);
+  --compliment-alert-bg-color: rgba(212, 111, 156, 0.56);
+  --submit-btn-color: rgb(29, 108, 255);
+  --warning-color: rgb(255, 86, 86);
+  --open-cards-color: rgb(0, 153, 255);
+  --virtual-home-color: rgb(255, 153, 0);
+  --compliments-color: rgb(237, 127, 176);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-color);
+  color: white;
+  font-size: 1.2rem;
+  font-family: "Jersey 10", sans-serif;
+}
+
+h1,
+.desc,
+h2 {
+  text-align: center;
+}
+
+.character-container {
+  cursor: default !important;
+}
+
+.activity-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  padding: 2px 12px;
+  padding-bottom: 20px;
+  margin-bottom: 30px;
+  width: 800px;
+  max-width: 70%;
+  border-radius: 15px;
+  background-color: var(--bg-light-color);
+}
+
+#message {
+  margin-bottom: 10px;
+  width: 100%;
+  background-color: var(--bg-color);
+  border: 1px solid var(--bg-lighter-color);
+  border-radius: 15px;
+  padding: 5px 10px;
+  font-size: 1.5rem;
+  color: white;
+}
+
+.suggestions-container {
+  display: flex;
+  gap: 10px;
+}
+
+.suggestion {
+  cursor: pointer;
+  background-color: var(--bg-color);
+  border-radius: 15px;
+  padding: 0px 10px;
+  padding-bottom: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &:hover {
+    color: var(--warning-color);
+  }
+  & i {
+    color: var(--submit-btn-color) !important;
+  }
+}

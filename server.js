@@ -764,6 +764,42 @@ app.post("/api/home/rename", async (req, res) => {
   return res.send({ success: true, renamed: objToRename });
 });
 
+app.post("/api/home/send/:type", (req, res) => {
+  const { type } = req.params;
+  let payload;
+  switch (type) {
+    case "kiss":
+      payload = JSON.stringify({
+        title: "💋💋 Mwaa!",
+        body: `${req.userVH.name} send you a kiss!`,
+      });
+      break;
+    case "cuddle":
+      payload = JSON.stringify({
+        title: `🥹 ${req.userVH.name} wants to cuddle with you!`,
+      });
+      break;
+    case "notify":
+      payload = JSON.stringify({
+        title: "Your love wants attention!",
+        body: `Give ${req.userVH.name} some attention pleease!`,
+      });
+      break;
+    case "message":
+      const { message } = req.body;
+      payload = JSON.stringify({
+        title: `${req.userVH.name} sends you a message:`,
+        body: message,
+      });
+      break;
+    default:
+      res.status(400).send({ error: "invalid type of send" });
+  }
+  console.log(payload);
+  sendNotificationToSO(req.person, payload);
+  res.send({ success: true });
+});
+
 const server = app.listen(process.env.PORT || "8080", () => {
   console.log(`listening on port ${server.address().port}`);
 });
