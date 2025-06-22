@@ -258,7 +258,7 @@ app.post("/api/compliment", async (req, res) => {
   await user.save();
   // Send notification to SO
   const payload = JSON.stringify({
-    title: "New Compliment",
+    title: "New Compliment 🐳",
     body: `You have a new compliment from ${
       req.person === "hanca" ? "Hanča" : "Vojtík"
     }!`,
@@ -295,7 +295,7 @@ app.post("/api/compliment/reaction", async (req, res) => {
   //return success and if replaced
   // send notification to SO
   const payload = JSON.stringify({
-    title: "New Reaction",
+    title: "New Reaction 😘",
     body: `You have a new reaction ${reaction} on your compliment from ${
       req.person === "hanca" ? "Hanča" : "Vojtík"
     }!`,
@@ -511,7 +511,7 @@ app.post("/api/home/feed", async (req, res) => {
     if (userHome.name === "Vojtík" || userHome.name === "Hanča") {
       // Send notification to Hanča
       const payload = JSON.stringify({
-        title: "Your Love is feeding you",
+        title: "Your Love is feeding you 🍔",
         body: "Your loving partner is giving you some food!",
       });
       sendNotificationToSO(req.person, payload);
@@ -733,11 +733,9 @@ app.post("/api/home/rename", async (req, res) => {
   }
 
   if (!objToRename) {
-    return res
-      .status(400)
-      .send({
-        error: `${type.charAt(0).toUpperCase() + type.slice(1)} not found`,
-      });
+    return res.status(400).send({
+      error: `${type.charAt(0).toUpperCase() + type.slice(1)} not found`,
+    });
   }
 
   objToRename.name = name;
