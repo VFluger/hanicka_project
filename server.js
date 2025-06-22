@@ -51,9 +51,9 @@ const openCardModel = mongoose.model("openCard", {
 
 const petsModel = mongoose.model("VHPets", {
   name: String,
-  hunger: { type: Number, default: 100, min: 0, max: 100 }, // More is better
-  cuddleNeed: { type: Number, default: 100, min: 0, max: 100 }, // More is better
-  playNeed: { type: Number, default: 100, min: 0, max: 100 }, // More is better
+  hunger: { type: Number, default: 100 }, // More is better
+  cuddleNeed: { type: Number, default: 100 }, // More is better
+  playNeed: { type: Number, default: 100 }, // More is better
   lastHungerUpdate: { type: Number, default: Date.now },
   lastCuddleUpdate: { type: Number, default: Date.now },
   lastPlayUpdate: { type: Number, default: Date.now },
@@ -61,19 +61,20 @@ const petsModel = mongoose.model("VHPets", {
 
 const usersHomeModel = mongoose.model("VHUsers", {
   name: String,
-  hunger: { type: Number, default: 100, min: 0, max: 100 },
-  tiredness: { type: Number, default: 100, min: 0, max: 100 }, // Less is better
+  hunger: { type: Number, default: 100 },
+  tiredness: { type: Number, default: 100 }, // Less is better
   lastHungerUpdate: { type: Number, default: Date.now },
   lastTirednessUpdate: { type: Number, default: Date.now },
   isSleeping: { type: Boolean, default: false },
   lastSleepStart: { type: Number, default: Date.now }, // When the user sleep is starting
   lastSleepEnd: { type: Number }, // When the user sleep is ending
+  tirednessRecoveredDuringSleep: { type: Number, default: 0 },
   isKid: { type: Boolean, default: false }, // If true, user is kid (no real user)
 });
 
 const foodModel = mongoose.model("VHFood", {
   name: { type: String, enum: ["bread", "pizza", "cake", "soup", "pasta"] },
-  hungerValue: { type: Number, default: 20, min: 0, max: 100 },
+  hungerValue: { type: Number, default: 20 },
   isForPets: { type: Boolean, default: true },
 });
 
@@ -426,19 +427,39 @@ const updateHomeAndUser = async (req, res, next) => {
 
     // if user is sleeping, update tiredness
     if (user.isSleeping) {
-      const sleepTime = Math.floor(
-        (Date.now() - user.lastSleepStart) / 60000 // in minutes
-      );
-      user.tiredness -= sleepTime; // 1% per minute
-      if (user.tiredness < 0) {
-        user.tiredness = 0;
+      const now = Date.now();
+      const sleepStart = user.lastSleepStart;
+      const sleepEnd = user.lastSleepEnd;
+      const totalSleepDuration = sleepEnd - sleepStart;
+      const timeSlept = Math.min(now - sleepStart, totalSleepDuration);
+      const sleepPercent = timeSlept / totalSleepDuration;
+
+      const totalTirednessRecovery = Math.floor(100 * sleepPercent);
+      const newlyRecovered =
+        totalTirednessRecovery - (user.tirednessRecoveredDuringSleep || 0);
+
+      if (newlyRecovered > 0) {
+        user.tiredness -= newlyRecovered;
+        user.tirednessRecoveredDuringSleep = totalTirednessRecovery;
+        if (user.tiredness < 0) user.tiredness = 0;
       }
-      // If sleep time is over, set isSleeping to false
-      // PUSH NOTIFICATION
-      if (Date.now() >= user.lastSleepEnd) {
+
+      if (now >= sleepEnd) {
+        //Push notification
+        const payload = JSON.stringify({
+          title: "Wake up! 💤",
+          body: `You have finished sleeping and ready for adventure!`,
+        });
+        if (req.person === "hanca") {
+          sendNotificationToSO("hanca", payload);
+        }
+        if (req.person === "vojtik") {
+          sendNotificationToSO("vojtik", payload);
+        }
         user.isSleeping = false;
         user.lastSleepStart = undefined;
         user.lastSleepEnd = undefined;
+        user.tirednessRecoveredDuringSleep = 0;
       }
     }
 
