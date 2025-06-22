@@ -85,6 +85,7 @@ $("#compliment-form").submit(function (e) {
 
   $.post("/api/compliment", formData)
     .done((response) => {
+      console.log(response);
       if (response.error) {
         if (response.hasAlreadyPosted) {
           $("#error-text").text("You already posted a compliment today.");
@@ -96,6 +97,7 @@ $("#compliment-form").submit(function (e) {
       }
     })
     .fail((error) => {
+      console.error(error);
       handleFail(error);
     });
 });

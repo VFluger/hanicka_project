@@ -5,10 +5,19 @@ const crypto = require("crypto");
 require("dotenv").config();
 const cookieParser = require("cookie-parser");
 const rateLimit = require("express-rate-limit");
-const { cp } = require("fs");
-const { time } = require("console");
+const webpush = require("web-push");
+const { send } = require("process");
 
 const app = Express();
+
+const publicVapidKey = process.env.PUBLIC_VAPID_KEY;
+const privateVapidKey = process.env.PRIVATE_VAPID_KEY;
+
+webpush.setVapidDetails(
+  "mailto:vojtovidlo@atlas.cz",
+  publicVapidKey,
+  privateVapidKey
+);
 
 //Database setup
 mongoose.connect(process.env.MONGO_URL);
@@ -92,6 +101,7 @@ app.use("/api", async (req, res, next) => {
   req.person = sessionInDb.person;
   const userObj = await userModel.findOne({ person: req.person });
   req.user = userObj;
+
   next();
 });
 
@@ -150,6 +160,37 @@ app.get("/logout", async (req, res) => {
     return res.send({ success: true });
   }
   res.status(500).send({ error: "internal server error" });
+});
+let hancaSubscription;
+let vojtikSubscription;
+
+const sendNotificationToSO = (person, payload) => {
+  console.log(person);
+  if (person === "hanca" && vojtikSubscription) {
+    console.log("Sending notification to Vojtik");
+    return webpush
+      .sendNotification(vojtikSubscription, payload)
+      .catch((err) => {
+        console.error(err);
+      });
+  }
+  if (person === "vojtik" && hancaSubscription) {
+    console.log("Sending notification to Hanča");
+    return webpush.sendNotification(hancaSubscription, payload).catch((err) => {
+      console.error(err);
+    });
+  }
+};
+
+//Notification subscribe
+app.post("/subscribe-hanca", (req, res) => {
+  hancaSubscription = req.body;
+  res.status(201).json({});
+});
+
+app.post("/subscribe-vojtik", (req, res) => {
+  vojtikSubscription = req.body;
+  res.status(201).json({});
 });
 
 app.get("/api/user", async (req, res) => {
@@ -215,6 +256,14 @@ app.post("/api/compliment", async (req, res) => {
   // update lastPosted variable
   user.lastSendCompliment = Date.now();
   await user.save();
+  // Send notification to SO
+  const payload = JSON.stringify({
+    title: "New Compliment",
+    body: `You have a new compliment from ${
+      req.person === "hanca" ? "Hanča" : "Vojtík"
+    }!`,
+  });
+  sendNotificationToSO(user.person, payload);
   res.send({ success: true });
 });
 
@@ -244,6 +293,14 @@ app.post("/api/compliment/reaction", async (req, res) => {
     res.status(500).send({ error: err });
   }
   //return success and if replaced
+  // send notification to SO
+  const payload = JSON.stringify({
+    title: "New Reaction",
+    body: `You have a new reaction ${reaction} on your compliment from ${
+      req.person === "hanca" ? "Hanča" : "Vojtík"
+    }!`,
+  });
+  sendNotificationToSO(compliment.personTo, payload);
   return res.send({ success: true, reaction, hasAlreadyReaction });
 });
 
@@ -451,6 +508,14 @@ app.post("/api/home/feed", async (req, res) => {
     // Feed user
     const userHome = await usersHomeModel.findById(userId);
     objToFeed = userHome;
+    if (userHome.name === "Vojtík" || userHome.name === "Hanča") {
+      // Send notification to Hanča
+      const payload = JSON.stringify({
+        title: "Your Love is feeding you",
+        body: "Your loving partner is giving you some food!",
+      });
+      sendNotificationToSO(req.person, payload);
+    }
   }
   if (!objToFeed) {
     return res.status(400).send({ error: "Object to feed not found" });
@@ -510,7 +575,6 @@ app.post("/api/home/:action", async (req, res) => {
   });
 });
 
-//activities: watch tv, make love, sleep, make food
 app.post("/api/home/activity/:activity", async (req, res) => {
   const { activity } = req.params;
   // Sleeping: for random time (1-3 hours)
@@ -572,6 +636,12 @@ app.post("/api/home/activity/:activity", async (req, res) => {
 
   // Love: instant action, S.O. notified, random chance of no boner and pregnancy, tiredness goes up by 10%
   if (activity === "love") {
+    //Send notification to SO
+    const payload = JSON.stringify({
+      title: "Love Action ❤️‍🔥",
+      body: `Your partner ${req.userVH.name} wants to give you backshots!`,
+    });
+    sendNotificationToSO(req.person, payload);
     if (Math.random() < 0.1) {
       // 10% chance of no boner
       return res.status(469).send({
@@ -648,19 +718,31 @@ app.post("/api/home/activity/:activity", async (req, res) => {
 });
 
 app.post("/api/home/rename", async (req, res) => {
-  const { userId, name } = req.body;
-  if (!userId || !name) {
+  const { id, name, type } = req.body;
+  if (!id || !name || !type) {
     return res.status(400).send({ error: "Missing parameters" });
   }
-  // Find user by id
-  const userToRename = await usersHomeModel.findById(userId);
-  if (!userToRename) {
-    return res.status(400).send({ error: "User not found" });
+
+  let objToRename;
+  if (type === "user") {
+    objToRename = await usersHomeModel.findById(id);
+  } else if (type === "pet") {
+    objToRename = await petsModel.findById(id);
+  } else {
+    return res.status(400).send({ error: "Invalid type" });
   }
-  // Update name
-  userToRename.name = name;
-  await userToRename.save();
-  return res.send({ success: true, userToRename });
+
+  if (!objToRename) {
+    return res
+      .status(400)
+      .send({
+        error: `${type.charAt(0).toUpperCase() + type.slice(1)} not found`,
+      });
+  }
+
+  objToRename.name = name;
+  await objToRename.save();
+  return res.send({ success: true, renamed: objToRename });
 });
 
 const server = app.listen(process.env.PORT || "8080", () => {

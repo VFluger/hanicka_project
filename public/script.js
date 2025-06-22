@@ -1,3 +1,4 @@
+let userPerson;
 const loadContent = async () => {
   $.get("/api/home/current-user")
     .done((data) => {
@@ -44,13 +45,19 @@ const loadContent = async () => {
       $("body").text("Error, sorry");
     });
 
-  // Load compliments
+  // Load compliments alert
   $.get("/api/user").done((data) => {
     if (data.error) {
       console.error("Error loading user data:", data.error);
       return;
     }
     const user = data.user;
+    userPerson = user.person; // Store the user person for later use
+    //Notifications register service worker
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js");
+    }
+
     const lastCheckedComplimentDate = new Date(
       user.lastCheckedCompliment
     ).getDate();
@@ -82,15 +89,39 @@ $(".character-container").click(() => {
   window.location.href = "/virtual-home";
 });
 
-//Notifications
 if (localStorage.getItem("notificationPermission")) {
   console.log("Notification permission already granted");
   $(".notification-container").hide();
 }
 
-$("#notification-btn").click(() => {
+const publicVapidKey =
+  "BGfr2rTkPl1xMPf1kl-E5srTcJVa7uLjDdg2TORdwDsv0S0c_XWEySdQCz5rgRypBo1A3RNI7zK72D198xv6SQ8";
+
+// Ask for notification permission
+$("#notification-btn").click(async () => {
   console.log("Notification button clicked, ask for permission");
-  //If granted, localStorage set
+  const permission = await Notification.requestPermission();
+  if (permission !== "granted") {
+    return console.log("Notification permission not granted");
+  }
+  console.log("Notification permission granted");
+  const reg = await navigator.serviceWorker.ready;
+  const sub = await reg.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: Uint8Array.from(
+      atob(publicVapidKey.replace(/-/g, "+").replace(/_/g, "/")),
+      (c) => c.charCodeAt(0)
+    ),
+  });
+  console.log("everything ready, sending sub to server");
+  await fetch(`/subscribe-${userPerson}`, {
+    method: "POST",
+    body: JSON.stringify(sub),
+    headers: { "Content-Type": "application/json" },
+  });
+
+  alert("Subscribed!");
+  // Set localStorage to remember permission
   localStorage.setItem("notificationPermission", true);
 });
 
@@ -113,6 +144,7 @@ $(".menu-container div").click(function () {
     console.log("Logging out...");
     $.get("/logout").done(() => {
       console.log("Logged out successfully.");
+      localStorage.removeItem("notificationPermission");
       window.location.href = "/";
     });
     return;
