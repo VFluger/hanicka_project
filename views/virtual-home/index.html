@@ -49,10 +49,52 @@
         <p class="tiredness-warning"></p>
       </div>
     </div>
-    <h2>Menu:</h2>
-    <div class="menu-container">
-      <div class="tile">Food</div>
-      <div class="tile">Pets</div>
+    <div class="sleeping-show menu-container" style="display: none">
+      <div id="end-sleep">
+        <i class="fa-solid fa-mug-saucer"></i>
+        <p>End Sleep</p>
+      </div>
+    </div>
+    <h2 class="sleeping-hide">Quick Actions:</h2>
+    <div class="menu-container activity-container sleeping-hide">
+      <div class="activity" id="sleep">
+        <i class="fa-solid fa-moon"></i>
+        <p>Sleep</p>
+      </div>
+      <div class="activity" id="tv">
+        <i class="fa-solid fa-tv"></i>
+        <p>Watch TV</p>
+      </div>
+      <div class="activity" id="eat">
+        <i class="fa-solid fa-cookie-bite"></i>
+        <p>Eat</p>
+      </div>
+    </div>
+    <h2 class="sleeping-hide">Menu:</h2>
+    <div class="menu-container sleeping-hide">
+      <div class="tile" id="food">
+        <i class="fa-solid fa-carrot"></i>
+        <p>Food</p>
+      </div>
+      <div class="tile" id="pets">
+        <i class="fa-solid fa-paw"></i>
+        <p>Pets</p>
+      </div>
+      <div class="tile" id="family">
+        <i class="fa-solid fa-people-group"></i>
+        <p>Family</p>
+      </div>
+    </div>
+    <div id="popup">
+      <div id="exit"><i class="fa-solid fa-xmark"></i></div>
+      <img src="/" alt="Popup-img" />
+      <p class="heading"></p>
+      <p class="desc"></p>
+      <p id="question"></p>
+      <form id="new-kid-form" class="password-container">
+        <input type="text" name="name" id="kid-name" />
+        <input type="submit" value="Send" id="submit-kid" />
+      </form>
     </div>
     <footer></footer>
     <script src="script.js"></script>

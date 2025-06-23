@@ -498,6 +498,33 @@ app.get("/api/home/:objToGet", async (req, res) => {
   return res.status(400).send({ error: "Invalid object to get" });
 });
 
+app.post("/api/home/change/rename", async (req, res) => {
+  const { id, name, type } = req.body;
+  console.log("REQUEST BODY: ", req.body);
+  if (!id || !name || !type) {
+    return res.status(400).send({ error: "Missing parameters" });
+  }
+
+  let objToRename;
+  if (type === "user") {
+    objToRename = await usersHomeModel.findById(id);
+  } else if (type === "pet") {
+    objToRename = await petsModel.findById(id);
+  } else {
+    return res.status(400).send({ error: "Invalid type" });
+  }
+
+  if (!objToRename) {
+    return res.status(400).send({
+      error: `${type} not found`,
+    });
+  }
+
+  objToRename.name = name;
+  await objToRename.save();
+  return res.send({ success: true, renamed: objToRename });
+});
+
 // feed fnc
 app.post("/api/home/feed", async (req, res) => {
   if (req.userVH.isSleeping) {
@@ -603,8 +630,7 @@ app.post("/api/home/activity/:activity", async (req, res) => {
   // no action allowed while in sleep
   // tiredness goes down by sleeping time in percentage (100min sleep = 1% per minute)
   if (activity === "sleep") {
-    const { endSleep } = req.body;
-    if (endSleep) {
+    if (req.body.endSleep) {
       if (!req.userVH.isSleeping) {
         return res.status(400).send({ error: "User is not sleeping" });
       }
@@ -644,6 +670,7 @@ app.post("/api/home/activity/:activity", async (req, res) => {
 
   // TV: instant action, tiredness goes down by 15%
   if (activity === "tv") {
+    console.log("tv");
     req.userVH.tiredness -= 15;
     if (req.userVH.tiredness < 0) {
       req.userVH.tiredness = 0;
@@ -663,21 +690,21 @@ app.post("/api/home/activity/:activity", async (req, res) => {
       body: `Your partner ${req.userVH.name} wants to give you backshots!`,
     });
     sendNotificationToSO(req.person, payload);
-    if (Math.random() < 0.1) {
+    const rand = Math.random();
+    if (rand < 0.1) {
       // 10% chance of no boner
-      return res.status(469).send({
+      return res.status(400).send({
         error: "No boner, try again later",
-        isBoner: false,
+        isNoBoner: true,
       });
-    }
-    if (Math.random() < 0.1) {
-      // 5% chance of pregnancy
+    } else if (rand < 0.15) {
+      // Next 5% chance of pregnancy (total 5%)
       // TODO: kids
       const newKid = new usersHomeModel({
         name: "Unnamed Kid",
         isKid: true,
       });
-      newKid.save();
+      await newKid.save();
       req.userVH.tiredness += 10; // Increase tiredness
       if (req.userVH.tiredness > 100) {
         req.userVH.tiredness = 100;
@@ -686,7 +713,7 @@ app.post("/api/home/activity/:activity", async (req, res) => {
       return res.send({
         success: true,
         isPregnant: true,
-        tiredness: req.userVH.tiredness + 10,
+        tiredness: req.userVH.tiredness,
         newKidId: newKid._id,
       });
     }
@@ -736,32 +763,6 @@ app.post("/api/home/activity/:activity", async (req, res) => {
       foodType,
     });
   }
-});
-
-app.post("/api/home/rename", async (req, res) => {
-  const { id, name, type } = req.body;
-  if (!id || !name || !type) {
-    return res.status(400).send({ error: "Missing parameters" });
-  }
-
-  let objToRename;
-  if (type === "user") {
-    objToRename = await usersHomeModel.findById(id);
-  } else if (type === "pet") {
-    objToRename = await petsModel.findById(id);
-  } else {
-    return res.status(400).send({ error: "Invalid type" });
-  }
-
-  if (!objToRename) {
-    return res.status(400).send({
-      error: `${type.charAt(0).toUpperCase() + type.slice(1)} not found`,
-    });
-  }
-
-  objToRename.name = name;
-  await objToRename.save();
-  return res.send({ success: true, renamed: objToRename });
 });
 
 app.post("/api/home/send/:type", (req, res) => {
