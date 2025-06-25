@@ -1,5 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Edu+NSW+ACT+Cursive:wght@400..700&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap");
-
+@import url("https://fonts.cdnfonts.com/css/satoshi");
 :root {
   --bg-color: #212121;
   --bg-light-color: #272727;
@@ -12,6 +12,7 @@
   --open-cards-color: rgb(0, 153, 255);
   --virtual-home-color: rgb(255, 153, 0);
   --compliments-color: rgb(237, 127, 176);
+  --last-page-color: rgb(99, 99, 99);
 }
 
 body {
@@ -27,4 +28,218 @@ h1,
 .desc,
 h2 {
   text-align: center;
+}
+
+.status-container {
+  width: 70%;
+  min-width: 500px;
+  margin: 50px auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+}
+
+.status-inner {
+  width: 45%;
+}
+
+.hunger,
+.tiredness,
+.playfulness {
+  position: relative;
+  width: 100%;
+  height: 15px;
+  background: var(--bg-lighter-color);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.hunger-fill,
+.tiredness-fill,
+.playfulness-fill {
+  height: 100%;
+  width: 0%; /* dynamically set via JS */
+  background-color: green;
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+
+.tiredness-fill {
+  background: darkorange !important;
+}
+
+.playfulness-fill {
+  background: rgb(0, 145, 255) !important;
+}
+
+.hunger-text,
+.tiredness-text,
+.playfulness-text {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  top: -2px;
+  line-height: 20px;
+  color: white;
+  font-weight: bold;
+  pointer-events: none;
+  font-size: 0.9rem;
+}
+
+.hunger-warning,
+.tiredness-warning {
+  color: var(--warning-color);
+  margin-top: 10px;
+  margin-bottom: 30px;
+}
+
+.img-status-container {
+  width: 35px;
+  & img {
+    width: 100%;
+  }
+}
+
+h1 a {
+  color: var(--last-page-color);
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
+h1 {
+  font-family: "Satoshi", sans-serif;
+  text-align: start;
+  margin-left: 30px;
+}
+
+#food-section {
+  width: 70%;
+  min-width: 500px;
+  margin: 0 auto;
+}
+
+.food-item {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: var(--bg-light-color);
+  border-radius: 10px;
+  & img {
+    width: 100px;
+  }
+  & .button-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-right: 15px;
+    & button {
+      cursor: pointer;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: var(--submit-btn-color);
+      color: white;
+      transition: scale 0.2s ease;
+      &:hover {
+        scale: 1.1;
+      }
+    }
+  }
+}
+
+#popup .img-container {
+  width: 25%;
+  & img {
+    width: 100%;
+  }
+}
+
+#popup .feeder-container div {
+  margin-right: 20px;
+}
+
+#vojtik-img-container {
+  width: 20% !important;
+  margin-right: 20px;
+  & img {
+    border-radius: 10px;
+  }
+}
+
+.feeders-container {
+  margin-top: 50px;
+}
+
+#popup .hunger,
+#popup .tiredness,
+#popup .playfulness {
+  background-color: var(--bg-color);
+}
+
+.feeder-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--bg-lighter-color);
+  border-radius: 10px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  transition: scale 0.2s ease;
+  &:hover {
+    scale: 1.05;
+  }
+}
+
+#popup h3 {
+  font-size: 1.7rem;
+  margin-bottom: 10px;
+}
+
+#popup .status-container {
+  margin-top: 20px;
+}
+
+.make-food-btn {
+  width: 25%;
+  margin: 0 auto;
+  font-size: 2rem;
+  font-weight: bold;
+  background-color: var(--submit-btn-color);
+  padding-left: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  transition: scale 0.2s ease;
+  color: white;
+  &:hover {
+    scale: 1.1;
+  }
+}
+
+.food-to-make-item {
+  background-color: var(--bg-lighter-color);
+  cursor: pointer;
+  transition: scale 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  &:hover {
+    scale: 1.05;
+  }
+  & img {
+    width: 15%;
+  }
+  & .food-name {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-left: 10px;
+  }
 }

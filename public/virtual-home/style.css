@@ -34,7 +34,7 @@ h2 {
   cursor: default !important;
 }
 
-.activity-container {
+.activity-container.activity-container-css {
   display: flex;
   flex-direction: column;
   justify-content: center;

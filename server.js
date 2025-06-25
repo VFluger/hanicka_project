@@ -51,6 +51,7 @@ const openCardModel = mongoose.model("openCard", {
 
 const petsModel = mongoose.model("VHPets", {
   name: String,
+  type: { type: String, enum: ["cat", "dog", "bunny"], required: true },
   hunger: { type: Number, default: 100 }, // More is better
   cuddleNeed: { type: Number, default: 100 }, // More is better
   playNeed: { type: Number, default: 100 }, // More is better
@@ -736,6 +737,7 @@ app.post("/api/home/activity/:activity", async (req, res) => {
     const foodValues = {
       pizza: { hungerValue: 30, tirednessValue: 10, isForPets: true },
       pasta: { hungerValue: 20, tirednessValue: 5, isForPets: true },
+      soup: { hungerValue: 15, tirednessValue: 2, isForPets: false },
       cake: { hungerValue: 25, tirednessValue: 8, isForPets: true },
       twister: { hungerValue: 15, tirednessValue: 3, isForPets: false },
       redbull: { hungerValue: 10, tirednessValue: -5, isForPets: false }, // Redbull gives energy
