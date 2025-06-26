@@ -803,6 +803,83 @@ app.post("/api/home/send/:type", (req, res) => {
   res.send({ success: true });
 });
 
+app.get("/api/home/update-data", async (req, res) => {
+  //Fill compliments with data
+  const newCompliments = [
+    "Seš moje nejvetší šikulka a strašně tě milujuuu. 💋",
+    "",
+  ];
+  const complimentsToSave = newCompliments.map((text) => {
+    return new complimentModel({
+      personTo: "hanca",
+      text,
+      createdAt: Date.now(),
+    });
+  });
+  await complimentModel.insertMany(complimentsToSave);
+  // Fill open cards with data
+  const newCards = [
+    {
+      heading: "Když se necítíš ve své kůži",
+      text: "Testing text",
+    },
+  ];
+  const cardsToSave = newCards.map((card) => {
+    return new openCardModel({
+      heading: card.heading,
+      text: card.text,
+    });
+  });
+  await openCardModel.insertMany(cardsToSave);
+  // Add bunny to pets
+  const bunny = new petsModel({
+    name: "Bunny",
+    type: "bunny",
+    hunger: 100,
+    cuddleNeed: 100,
+    playNeed: 100,
+  });
+  await bunny.save();
+  // rm all kids
+  await usersHomeModel.deleteMany({ isKid: true });
+});
+
+app.get("/api/home/launch/launch", async (req, res) => {
+  // Update all pets and users stats
+  const users = await usersHomeModel.find();
+  const pets = await petsModel.find();
+
+  users.forEach((user) => {
+    user.hunger = 65;
+    user.tiredness = 25;
+    user.lastHungerUpdate = Date.now();
+    user.lastTirednessUpdate = Date.now();
+  });
+  pets.forEach((pet) => {
+    pet.hunger = Math.max(
+      0,
+      Math.min(100, 70 + Math.floor(Math.random() * 51) - 25)
+    );
+    pet.cuddleNeed = Math.max(
+      0,
+      Math.min(100, 85 + Math.floor(Math.random() * 51) - 25)
+    );
+    pet.playNeed = Math.max(
+      0,
+      Math.min(100, 65 + Math.floor(Math.random() * 51) - 25)
+    );
+    pet.lastHungerUpdate = Date.now();
+    pet.lastCuddleUpdate = Date.now();
+    pet.lastPlayUpdate = Date.now();
+  });
+  usersHomeModel.bulkSave(users);
+  petsModel.bulkSave(pets);
+  res.send({
+    success: true,
+    message: "All pets and users stats updated",
+  });
+});
+
 const server = app.listen(process.env.PORT || "8080", () => {
   console.log(`listening on port ${server.address().port}`);
 });
