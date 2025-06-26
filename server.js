@@ -74,7 +74,7 @@ const usersHomeModel = mongoose.model("VHUsers", {
 });
 
 const foodModel = mongoose.model("VHFood", {
-  name: { type: String, enum: ["bread", "pizza", "cake", "soup", "pasta"] },
+  name: { type: String },
   hungerValue: { type: Number, default: 20 },
   isForPets: { type: Boolean, default: true },
 });

@@ -78,7 +78,7 @@ $(".food-container").on("click", ".feed-btn", async function () {
   $("#popup-overlay, #popup").fadeIn(200);
   $("#popup .heading").text("Select who to give the food to:");
   $("#popup button").show();
-  $("#popup .food-container").hide();
+  $("#popup .food-to-make-container").hide();
   $("#popup .feeders-container").html("");
 });
 
@@ -94,7 +94,7 @@ $("#popup").on("click", "#users-btn", async function () {
       <div class="img-container" id="vojtik-img-container">
       <img id="vojtik-img" src="/media/vojtik_character.png" alt="avatar img">
       </div>
-      <div>
+      <div class="feeder-info">
       <h3>${user.name}</h3>
       <div class="status-container">
       <div class="status-inner">
@@ -122,7 +122,7 @@ $("#popup").on("click", "#users-btn", async function () {
         "kid" + Math.floor(Math.random() * 2 + 1)
       }.png" alt="avatar img">
       </div>
-      <div>
+      <div class="feeder-info">
       <h3>${user.name}</h3>
       <div class="status-container">
       <div class="status-inner">
@@ -174,7 +174,7 @@ $("#popup").on("click", "#pets-btn", async function () {
       <div class="img-container">
       <img src="/media/${pet.type}.png" alt="avatar img">   
       </div>
-      <div>
+      <div class="feeder-info">
       <h3>${pet.name}</h3>
       <div class="status-container">
       <div class="status-inner">
@@ -231,7 +231,8 @@ $(".make-food-btn").click(function () {
   $("#popup-overlay, #popup").fadeIn(200);
   $("#popup .heading").text("Select food to make:");
   $("#popup button").hide();
-  $("#popup .food-container").show();
+  $("#popup .feeders-container").html("");
+  $("#popup .food-to-make-container").show();
 });
 
 $("#popup").on("click", ".food-to-make-item", function () {
@@ -247,3 +248,5 @@ $("#popup").on("click", ".food-to-make-item", function () {
     .fail((xhr) => console.error(xhr.responseJSON));
   $("#popup-overlay, #popup").fadeOut(200);
 });
+
+$("#popup-overlay").click(() => $("#popup-overlay, #popup").fadeOut(200));

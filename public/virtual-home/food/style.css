@@ -164,8 +164,8 @@ h1 {
   margin-right: 20px;
 }
 
-#vojtik-img-container {
-  width: 20% !important;
+.img-container#vojtik-img-container {
+  width: 20%;
   margin-right: 20px;
   & img {
     border-radius: 10px;
@@ -207,11 +207,12 @@ h1 {
 
 .make-food-btn {
   width: 25%;
+  min-width: 250px;
   margin: 0 auto;
   font-size: 2rem;
   font-weight: bold;
+  text-align: center;
   background-color: var(--submit-btn-color);
-  padding-left: 15px;
   border-radius: 10px;
   margin-bottom: 20px;
   cursor: pointer;
@@ -241,5 +242,93 @@ h1 {
     font-size: 2rem;
     font-weight: bold;
     margin-left: 10px;
+  }
+}
+
+.buttons-container-popup {
+  margin-top: 25px;
+  display: flex;
+  gap: 20px;
+}
+
+@media (max-width: 650px) {
+  #popup {
+    width: 85% !important;
+  }
+  #food-section {
+    min-width: 0px;
+    width: 90%;
+  }
+  .food-item {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    & .button-container {
+      grid-column-start: 1;
+      grid-column-end: 3;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      & button {
+        width: 100px;
+        font-size: 1.2rem;
+        border-radius: 10px;
+      }
+    }
+    & h3 {
+      font-size: 2rem;
+    }
+    & p {
+      margin-left: 20px;
+    }
+  }
+  .buttons-container-popup {
+    display: flex;
+    justify-content: space-evenly;
+    gap: 0px;
+    & button {
+      font-size: 2rem;
+      border-radius: 10px;
+    }
+  }
+  h1 {
+    margin: 50px auto;
+    text-align: center;
+  }
+}
+
+@media (max-width: 1300px) {
+  .status-container {
+    flex-direction: column;
+    align-items: start;
+  }
+  .img-status-container {
+    margin-bottom: 20px;
+  }
+  .feeder-info {
+    max-width: 75%;
+  }
+  .feeder-container {
+    & .img-container {
+      min-width: 100px;
+    }
+  }
+  .img-container#vojtik-img-container {
+    min-width: 100px;
+    width: 15%;
+  }
+  .status-inner {
+    margin-bottom: 20px;
+  }
+  body > .status-container {
+    align-items: center;
+    min-width: 0px;
+    width: 100%;
+    & .status-inner {
+      width: 90%;
+      margin-bottom: 5px;
+    }
   }
 }
