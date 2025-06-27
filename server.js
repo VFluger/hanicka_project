@@ -79,6 +79,16 @@ const foodModel = mongoose.model("VHFood", {
   isForPets: { type: Boolean, default: true },
 });
 
+const notificationModel = mongoose.model("notification", {
+  heading: String,
+  text: String,
+  type: {
+    type: String,
+    enum: ["love", "kiss", "message", "cuddle", "attention"],
+  },
+  timeOfSend: { type: String, default: Date.now() },
+});
+
 // Basic middleware
 app.use((req, res, next) => {
   console.log(`${req.method} ON ${req.url}`);
