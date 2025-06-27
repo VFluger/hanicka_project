@@ -1,6 +1,6 @@
 // Get compliment from server
 let currectCompliment;
-const getCompliment = () => {
+const loadContent = () => {
   $.get("/api/compliment")
     .done((data) => {
       currectCompliment = data.compliment;
@@ -51,7 +51,7 @@ const getCompliment = () => {
       $("#compliment").text("Error, sorry");
     });
 };
-getCompliment();
+loadContent();
 // Open write compliment section
 $("#write-comp-heading").click(() => {
   if ($(".write-compliment-container").hasClass("visible")) {
@@ -85,6 +85,7 @@ $("#compliment-form").submit(function (e) {
 
   $.post("/api/compliment", formData)
     .done((response) => {
+      console.log(response);
       if (response.error) {
         if (response.hasAlreadyPosted) {
           $("#error-text").text("You already posted a compliment today.");
@@ -96,6 +97,7 @@ $("#compliment-form").submit(function (e) {
       }
     })
     .fail((error) => {
+      console.error(error);
       handleFail(error);
     });
 });

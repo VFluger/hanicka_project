@@ -1,0 +1,248 @@
+@import url("https://fonts.googleapis.com/css2?family=Edu+NSW+ACT+Cursive:wght@400..700&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap");
+
+:root {
+  --bg-color: #212121;
+  --bg-light-color: #272727;
+  --bg-lighter-color: #323232;
+  --card-bg-color: rgba(255, 255, 240, 0.56);
+  --card-bg-active-color: rgba(255, 153, 199, 0.56);
+  --compliment-alert-bg-color: rgba(212, 111, 156, 0.56);
+  --submit-btn-color: rgb(29, 108, 255);
+  --warning-color: rgb(255, 86, 86);
+  --open-cards-color: rgb(0, 153, 255);
+  --virtual-home-color: rgb(255, 153, 0);
+  --compliments-color: rgb(237, 127, 176);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-color);
+  color: white;
+  font-size: 1.2rem;
+  font-family: "Jersey 10", sans-serif;
+}
+
+h1,
+.desc,
+h2 {
+  text-align: center;
+}
+
+h1 a {
+  color: var(--last-page-color);
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
+h1 {
+  font-family: "Satoshi", sans-serif;
+  text-align: start;
+  margin-left: 30px;
+}
+
+.user-container div {
+  margin-right: 20px;
+}
+
+.users-container {
+  margin-top: 50px;
+}
+
+.img-container {
+  width: 25%;
+  & img {
+    width: 100%;
+  }
+}
+
+.hunger,
+.tiredness,
+.playfulness {
+  background-color: var(--bg-color);
+}
+
+.user-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--bg-lighter-color);
+  border-radius: 10px;
+  margin: 30px auto;
+  padding: 20px;
+  max-width: 700px;
+  width: 95%;
+  transition: transform 0.2s ease;
+}
+
+button {
+  transition: all 0.3s ease;
+  font-size: 1.2rem !important;
+  font-family: "Jersey 10", sans-serif;
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+.img-container {
+  width: 100%;
+  max-width: 200px;
+  margin-bottom: 20px;
+}
+
+.img-container img {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.user-info {
+  flex: 1;
+  min-width: 250px;
+  text-align: center;
+}
+
+.user-heading {
+  font-size: 1.17em;
+  font-weight: bold;
+  font-family: inherit;
+  border: none;
+  background: transparent;
+  color: inherit;
+  outline: none;
+  margin: 0;
+  padding: 0;
+  padding-left: 10px;
+  display: inline;
+  border-radius: 10px;
+  &.editing {
+    border: 2px solid var(--submit-btn-color);
+  }
+}
+
+.status-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.status-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.hunger,
+.tiredness,
+.playfulness {
+  flex: 1;
+  position: relative;
+  height: 20px;
+  background-color: #2b2b2b !important;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.hunger-fill,
+.tiredness-fill,
+.playfulness-fill {
+  height: 100%;
+  background-color: var(--compliments-color);
+  transition: width 0.3s ease;
+}
+
+.hunger-text,
+.tiredness-text,
+.playfulness-text {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.8rem;
+  color: white;
+}
+
+.user-actions {
+  width: 100%;
+  text-align: center;
+  margin-top: 15px;
+}
+
+.user-actions button {
+  background-color: var(--submit-btn-color);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  margin: 0 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
+}
+
+.user-actions button:hover {
+  background-color: #1e7fff;
+}
+
+@media (min-width: 768px) {
+  .user-container {
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    text-align: left;
+  }
+
+  .img-container {
+    margin-bottom: 0;
+    max-width: 150px;
+  }
+
+  .user-info {
+    text-align: left;
+  }
+
+  .user-actions {
+    text-align: right;
+  }
+}
+
+@media (max-width: 550px) {
+  div.status-container {
+    align-items: center;
+  }
+}
+
+@media (max-width: 500px) {
+  .status-container {
+    min-width: 0px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    & .status-inner {
+      min-width: 200px !important;
+    }
+  }
+  .user-container div {
+    margin-right: 0 !important;
+  }
+  button {
+    font-size: 1.5rem !important;
+  }
+}
+
+.fa-check,
+.fa-pen-to-square {
+  cursor: pointer;
+}
+
+#popup .img-container {
+  max-width: none;
+  width: 70% !important;
+  margin: auto;
+}

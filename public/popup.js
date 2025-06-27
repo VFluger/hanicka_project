@@ -44,16 +44,7 @@ $("#login-form").submit(function (e) {
       if (response.success) {
         handleSuccess();
         $("#popup-overlay, #popup").fadeOut(200);
-        try {
-          getCompliment();
-        } catch (err) {
-          return;
-        }
-        try {
-          loadCards();
-        } catch (err) {
-          return;
-        }
+        loadContent();
       }
     })
     .fail((error) => {

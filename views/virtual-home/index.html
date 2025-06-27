@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="/footer.css" />
+    <link rel="stylesheet" href="/style.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script
+      src="https://kit.fontawesome.com/9dc89b769e.js"
+      crossorigin="anonymous"
+    ></script>
+    <title>4Hanička - Virtual Home</title>
+  </head>
+  <body>
+    <h2>Your love:</h2>
+    <div class="activity-container activity-container-css">
+      <input
+        type="text"
+        name="message"
+        id="message"
+        placeholder="Send Vojtik a message!"
+      />
+      <div class="suggestions-container">
+        <div class="suggestion" id="kiss">💋 Send a kiss</div>
+        <div class="suggestion" id="love">❤️‍🔥 Make love</div>
+        <div class="suggestion" id="cuddle">🐳 Cuddle</div>
+        <div class="suggestion" id="notify">😎 Get attention</div>
+      </div>
+    </div>
+    <h2 class="character-heading"></h2>
+    <div class="character-container">
+      <div class="img-container">
+        <img id="character-img" src="/" alt="Character Image" />
+      </div>
+      <div class="status-container">
+        <p class="status-heading">Fullness:</p>
+        <div class="hunger">
+          <div class="hunger-fill"></div>
+          <span class="hunger-text">0%</span>
+        </div>
+        <p class="hunger-warning"></p>
+        <p class="status-heading">Tiredness:</p>
+        <div class="tiredness">
+          <div class="tiredness-fill"></div>
+          <span class="tiredness-text">0%</span>
+        </div>
+        <p class="tiredness-warning"></p>
+      </div>
+    </div>
+    <div class="sleeping-show menu-container" style="display: none">
+      <div id="end-sleep">
+        <i class="fa-solid fa-mug-saucer"></i>
+        <p>End Sleep</p>
+      </div>
+    </div>
+    <h2 class="sleeping-hide">Quick Actions:</h2>
+    <div class="menu-container activity-container sleeping-hide">
+      <div class="activity" id="sleep">
+        <i class="fa-solid fa-moon"></i>
+        <p>Sleep</p>
+      </div>
+      <div class="activity" id="tv">
+        <i class="fa-solid fa-tv"></i>
+        <p>Watch TV</p>
+      </div>
+      <div class="activity" id="eat">
+        <i class="fa-solid fa-cookie-bite"></i>
+        <p>Eat</p>
+      </div>
+    </div>
+    <h2 class="sleeping-hide" style="margin-top: 50px">Menu:</h2>
+    <div class="menu-container sleeping-hide">
+      <div class="tile" id="food">
+        <i class="fa-solid fa-carrot"></i>
+        <p>Food</p>
+      </div>
+      <div class="tile" id="pets">
+        <i class="fa-solid fa-paw"></i>
+        <p>Pets</p>
+      </div>
+      <div class="tile" id="family">
+        <i class="fa-solid fa-people-group"></i>
+        <p>Family</p>
+      </div>
+    </div>
+    <div id="popup-overlay"></div>
+    <div id="popup">
+      <div id="exit"><i class="fa-solid fa-xmark"></i></div>
+      <img src="/" alt="Popup-img" />
+      <p class="heading"></p>
+      <p class="desc"></p>
+      <p id="question"></p>
+      <form id="new-kid-form" class="password-container">
+        <input type="text" name="name" id="kid-name" />
+        <input type="submit" value="Send" id="submit-kid" />
+      </form>
+    </div>
+    <footer></footer>
+    <script src="script.js"></script>
+    <script src="/footer.js"></script>
+  </body>
+</html>

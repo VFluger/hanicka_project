@@ -1,0 +1,39 @@
+<div class="pet-container pet-container" id="${pet._id}">
+  <div class="img-container">
+    <img src="/media/${pet.type}.png" alt="avatar img" />
+  </div>
+  <div class="pet-info">
+    <div class="status-container">
+      <input class="pet-heading" value="${pet.name}" disabled />
+      <i
+        class="fa-solid fa-pen-to-square edit-btn"
+        style="left: ${offsetOfEditBtn}px"
+      ></i>
+      <div class="status-inner">
+        Hunger:
+        <div class="hunger">
+          <div class="hunger-fill" style="width: ${pet.hunger}%"></div>
+          <div class="hunger-text">${pet.hunger}%</div>
+        </div>
+      </div>
+      <div class="status-inner">
+        Cuddles:
+        <div class="tiredness">
+          <div class="tiredness-fill" style="width: ${pet.cuddleNeed}%"></div>
+          <div class="tiredness-text">${pet.cuddleNeed}%</div>
+        </div>
+      </div>
+      <div class="status-inner">
+        Playfulness:
+        <div class="playfulness">
+          <div class="playfulness-fill" style="width: ${pet.playNeed}%"></div>
+          <div class="playfulness-text">${pet.playNeed}%</div>
+        </div>
+      </div>
+    </div>
+    <div class="pet-actions">
+      <button class="cuddle-btn" data-id="${pet._id}">Cuddle</button>
+      <button class="play-btn" data-id="${pet._id}">Play</button>
+    </div>
+  </div>
+</div>

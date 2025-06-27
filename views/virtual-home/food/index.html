@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="/popup.css" />
+    <link rel="stylesheet" href="/footer.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script
+      src="https://kit.fontawesome.com/9dc89b769e.js"
+      crossorigin="anonymous"
+    ></script>
+    <title>4Hanička - Virtual Home - Food</title>
+  </head>
+  <body>
+    <nav></nav>
+    <div class="status-container">
+      <div class="status-inner">
+        <div class="hunger">
+          <div class="hunger-fill"></div>
+          <div class="hunger-text"></div>
+        </div>
+        <div class="hunger-warning"></div>
+      </div>
+      <div class="status-inner">
+        <div class="tiredness">
+          <div class="tiredness-fill"></div>
+          <div class="tiredness-text"></div>
+        </div>
+        <div class="tiredness-warning"></div>
+      </div>
+    </div>
+    <header>
+      <h1><a href="/virtual-home">Virtual Home/</a>Food</h1>
+    </header>
+    <section id="food-section">
+      <div class="make-food-btn">+ Make more food</div>
+      <div class="food-container"></div>
+    </section>
+    <div id="popup-overlay"></div>
+    <div id="popup">
+      <p class="heading">Select who to give the food</p>
+      <div class="buttons-container-popup">
+        <button id="users-btn" class="select-btn">Humans</button>
+        <button id="pets-btn" class="select-btn">Pets</button>
+      </div>
+      <div class="feeders-container"></div>
+      <div class="food-to-make-container">
+        <div class="food-to-make-item" id="pizza">
+          <img src="/media/pizza.png" alt="Pizza avatar" />
+          <p class="food-name">Pizza</p>
+          <button class="make-btn">Bake</button>
+        </div>
+        <div class="food-to-make-item" id="soup">
+          <img src="/media/soup.png" alt="Soup avatar" />
+          <p class="food-name">Soup</p>
+          <button class="make-btn">Cook</button>
+        </div>
+        <div class="food-to-make-item" id="pasta">
+          <img src="/media/pasta.png" alt="Pasta avatar" />
+          <p class="food-name">Pasta</p>
+          <button class="make-btn">Cook</button>
+        </div>
+        <div class="food-to-make-item" id="twister">
+          <img src="/media/twister.png" alt="Twister avatar" />
+          <p class="food-name">Twister</p>
+          <button class="make-btn">Buy</button>
+        </div>
+        <div class="food-to-make-item" id="redbull">
+          <img src="/media/redbull.png" alt="Redbull avatar" />
+          <p class="food-name">Redbullina</p>
+          <button class="make-btn">Buy</button>
+        </div>
+      </div>
+    </div>
+    <footer></footer>
+    <script src="script.js"></script>
+    <script src="/footer.js"></script>
+  </body>
+</html>

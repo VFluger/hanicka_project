@@ -3,41 +3,125 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hello World test</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="/popup.css" />
+    <link rel="stylesheet" href="/footer.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script
+      src="https://kit.fontawesome.com/9dc89b769e.js"
+      crossorigin="anonymous"
+    ></script>
+    <title>4Hanička - Dashboard</title>
   </head>
   <body>
-    <h1>Hello World!!!</h1>
-    <form action="/login" method="post">
-      <label for="person">Person:</label>
-      <select name="person" id="person">
-        <option value="vojtik">Vojtik</option>
-        <option value="hanca">Hanca</option>
-      </select>
-      <label for="password">Password:</label>
-      <input type="password" name="password" id="password" />
-      <input type="submit" value="Submit" />
-    </form>
-    <h2>Compliment</h2>
-    <form action="/api/compliment" method="post">
-      <textarea name="complimentText" id="textareaCompliment"></textarea>
-      <input type="submit" value="Submit" />
-    </form>
-    <h2>Reaction</h2>
-    <form action="/api/compliment/reaction" method="post">
-      <label for="compliment-id"></label>
-      <input type="text" name="complimentId" id="compliment-id" />
-      <select name="reaction" id="person">
-        <option value="heart">heart</option>
-        <option value="whale">whale</option>
-        <option value="heartFace">heartFace</option>
-        <input type="submit" value="submit" />
-      </select>
-    </form>
-    <h2>Delete reaction</h2>
-    <form action="/api/compliment/del-reaction" method="post">
-      <label for="compliment-id"></label>
-      <input type="text" name="complimentId" id="compliment-id" />
-      <input type="submit" value="submit" />
-    </form>
+    <div class="heading-container">
+      <h1 id="welcome-text">Welcome user</h1>
+      <p class="desc"></p>
+    </div>
+    <div class="first-time-visit">
+      <h2 class="expand-heading">
+        <i class="fa-solid fa-caret-down"></i>First time?
+      </h2>
+      <div class="expand-content">
+        <p style="font-family: 'Edu NSW ACT Cursive'">
+          Ahoj haničko moje milovaná, k tvým narozkám jsem se rozhodl ti dát
+          takový programátorský dáreček.
+        </p>
+        <p>Můžeš zde najít několik sekcí:</p>
+        <ol>
+          <li id="li-compliments">Compliments</li>
+          <p>
+            Daily Compliments napsané mnou a pouze mnou na zlepšení dne. Můžeš
+            na ně i zareagovat z pár vybraných emoji.
+          </p>
+          <li id="li-open-cards">Open When Cards</li>
+          <p>
+            Kartičky pro různé příležitosti. Ať už se budeš cítít na dně, nebo
+            nejlépe na světě, můžeš si najít kartičku pro danou příležitost a
+            přečíst si dopis od tvého milovaného.
+          </p>
+          <li id="li-virtual-home">Virtual Home</li>
+          <p>
+            Náš vlastní domeček! Můžeš vařit, koukat na telku a nebo mi dát
+            virtuální pusinku. Web hra vytvořená přímo pro nás dva...
+          </p>
+        </ol>
+      </div>
+    </div>
+    <div class="compliment-alert">
+      <p class="compliment-text"></p>
+      <button type="button" class="compliment-btn">Get good mood</button>
+    </div>
+    <h2 class="character-heading">Your Character:</h2>
+    <div class="character-container">
+      <div class="img-container">
+        <img id="character-img" src="/" alt="Character Image" />
+      </div>
+      <div class="status-container">
+        <p class="status-heading">Fullness:</p>
+        <div class="hunger">
+          <div class="hunger-fill"></div>
+          <span class="hunger-text">0%</span>
+        </div>
+        <p class="hunger-warning"></p>
+        <p class="status-heading">Tiredness:</p>
+        <div class="tiredness">
+          <div class="tiredness-fill"></div>
+          <span class="tiredness-text">0%</span>
+        </div>
+        <p class="tiredness-warning"></p>
+      </div>
+    </div>
+    <div class="notification-container">
+      <i class="fa fa-bell" aria-hidden="true"></i>
+      <p>
+        Get notified about your character, compliment reactions and other sweet
+        stuff Vojtík sends you.
+      </p>
+      <button type="button" id="notification-btn">Get notifications</button>
+    </div>
+    <h2>Menu:</h2>
+    <div class="menu-container">
+      <div
+        id="compliments-container"
+        href="/compliments"
+        color="rgb(237, 127, 176)"
+      >
+        <i class="fa-solid fa-comment-dots"></i>Compliments
+      </div>
+      <div
+        id="open-cards-container"
+        href="/open-when-cards"
+        color="rgb(0, 153, 255)"
+      >
+        <i class="fa-solid fa-heart"></i>Open When Cards
+      </div>
+      <div
+        id="virtual-home-container"
+        href="/virtual-home"
+        color="rgb(255, 153, 0)"
+      >
+        <i class="fa-solid fa-house"></i>Virtual Home
+      </div>
+      <div id="logout-container" href="/logout" color="green">
+        <i class="fa-solid fa-right-from-bracket"></i>Log out
+      </div>
+    </div>
+    <div id="popup">
+      <p class="heading">Log in</p>
+      <p class="desc">Please log in before continuing...</p>
+      <p class="select-user">Select user:</p>
+      <button id="hanicka-btn" class="select-btn">Hanička</button>
+      <button id="vojtisek-btn" class="select-btn">Vojtíšek</button>
+      <p id="question"></p>
+      <form id="login-form" class="password-container">
+        <input type="password" name="password" id="password" />
+        <input type="submit" value="Send" id="submit-login" />
+      </form>
+    </div>
+    <footer></footer>
+    <script src="/script.js"></script>
+    <script src="/popup.js"></script>
+    <script src="/footer.js"></script>
   </body>
 </html>
