@@ -600,13 +600,13 @@ app.post("/api/home/:action", async (req, res) => {
   }
   // Update cuddle or play need
   if (action === "cuddle") {
-    pet.cuddleNeed += Math.random() * 30 + 10;
+    pet.cuddleNeed += Math.floor(Math.random() * 50 + 10);
     if (pet.cuddleNeed > 100) {
       pet.cuddleNeed = 100;
     }
     pet.lastCuddleUpdate = Date.now();
   } else if (action === "play") {
-    pet.playNeed += Math.random() * 30 + 10;
+    pet.playNeed += Math.floor(Math.random() * 50 + 10);
     if (pet.playNeed > 100) {
       pet.playNeed = 100;
     }
@@ -735,12 +735,12 @@ app.post("/api/home/activity/:activity", async (req, res) => {
   if (activity === "food") {
     // FOODS TO CHOOSE FROM: pizza, pasta, cake, twister, redbull
     const foodValues = {
-      pizza: { hungerValue: 30, tirednessValue: 10, isForPets: true },
-      pasta: { hungerValue: 20, tirednessValue: 5, isForPets: true },
-      soup: { hungerValue: 15, tirednessValue: 2, isForPets: false },
-      cake: { hungerValue: 25, tirednessValue: 8, isForPets: true },
-      twister: { hungerValue: 15, tirednessValue: 3, isForPets: false },
-      redbull: { hungerValue: 10, tirednessValue: -5, isForPets: false }, // Redbull gives energy
+      pizza: { hungerValue: 75, tirednessValue: 10, isForPets: true },
+      pasta: { hungerValue: 55, tirednessValue: 5, isForPets: true },
+      soup: { hungerValue: 60, tirednessValue: 2, isForPets: false },
+      cake: { hungerValue: 100, tirednessValue: 8, isForPets: true },
+      twister: { hungerValue: 14, tirednessValue: 3, isForPets: false },
+      redbull: { hungerValue: 40, tirednessValue: -30, isForPets: false }, // Redbull gives energy
     };
     const { foodType } = req.body;
     if (!foodValues[foodType]) {
@@ -765,6 +765,24 @@ app.post("/api/home/activity/:activity", async (req, res) => {
       foodType,
     });
   }
+});
+
+app.post("/api/home/family/put-to-sleep", async (req, res) => {
+  const { userId } = req.body;
+  if (!userId) {
+    return res.status(400).send({ error: "Missing userId" });
+  }
+  const user = await usersHomeModel.findById(userId);
+  if (!user) {
+    return res.status(400).send({ error: "User not found" });
+  }
+  //Instantly -70 tiredness
+  user.tiredness -= 70;
+  if (user.tiredness < 0) {
+    user.tiredness = 0;
+  }
+  user.save();
+  res.send({ success: true, tiredness: user.tiredness });
 });
 
 app.post("/api/home/send/:type", (req, res) => {

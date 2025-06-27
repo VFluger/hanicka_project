@@ -3,43 +3,47 @@ const loadContent = async () => {
   let pets;
   await $.get("/api/home/pets").done((data) => (pets = data.pets));
   const petsHTML = pets.map((pet) => {
+    const offsetOfEditBtn = pet.name.length * 10 + 10; // 8px per character + 10px padding
     return `<div class="pet-container pet-container" id="${pet._id}">
-      <div class="img-container">
-      <img src="/media/${pet.type}.png" alt="avatar img">   
-      </div>
-      <div class="pet-info">
-      <div class="status-container">
-      <input class="pet-heading" value="${pet.name}" disabled>
-      <i class="fa-solid fa-pen-to-square"></i>
+  <div class="img-container">
+    <img src="/media/${pet.type}.png" alt="avatar img" />
+  </div>
+  <div class="pet-info">
+    <div class="status-container">
+      <input class="pet-heading" value="${pet.name}" disabled />
+      <i
+        class="fa-solid fa-pen-to-square edit-btn"
+        style="left: ${offsetOfEditBtn}px"
+      ></i>
       <div class="status-inner">
-      Hunger:
+        Hunger:
         <div class="hunger">
           <div class="hunger-fill" style="width: ${pet.hunger}%"></div>
           <div class="hunger-text">${pet.hunger}%</div>
         </div>
       </div>
       <div class="status-inner">
-      Cuddles:
+        Cuddles:
         <div class="tiredness">
           <div class="tiredness-fill" style="width: ${pet.cuddleNeed}%"></div>
           <div class="tiredness-text">${pet.cuddleNeed}%</div>
         </div>
       </div>
       <div class="status-inner">
-      Playfulness:
+        Playfulness:
         <div class="playfulness">
           <div class="playfulness-fill" style="width: ${pet.playNeed}%"></div>
           <div class="playfulness-text">${pet.playNeed}%</div>
         </div>
       </div>
-      </div>
     </div>
-        <div class="pet-actions">
-        <button class="cuddle-btn" data-id="${pet._id}">Cuddle</button>
-        <button class="play-btn" data-id="${pet._id}">Play</button>
-        </div>
-        </div>
-      </div>`;
+    <div class="pet-actions">
+    <button class="cuddle-btn" data-id="${pet._id}">Cuddle</button>
+    <button class="play-btn" data-id="${pet._id}">Play</button>
+    </div>
+  </div>
+</div>
+  `;
   });
   $(".pets-container").html(petsHTML.join(""));
 };
@@ -106,7 +110,10 @@ $(document).on("click", ".fa-pen-to-square", function () {
   const petInput = $(this).parent().find("input");
   petInput.prop("disabled", false).addClass("editing");
   petInput.focus();
-  $(this).removeClass("fa-pen-to-square").addClass("fa-check");
+  $(this)
+    .removeClass("fa-pen-to-square")
+    .addClass("fa-check")
+    .css("left", "20px");
 });
 
 $(document).on("click", ".fa-check", function () {
@@ -125,6 +132,8 @@ $(document).on("click", ".fa-check", function () {
         // request failed, reload
         location.reload();
       }
+      const offsetOfEditBtn = data.renamed.name.length * 20 + 15;
+      $(this).css("left", `${offsetOfEditBtn}px`);
     })
     .fail((xhr) => console.error(xhr.responseJSON));
 });
