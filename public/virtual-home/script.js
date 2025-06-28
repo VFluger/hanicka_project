@@ -176,7 +176,7 @@ $(".suggestion").click(function () {
   });
 });
 
-$("#popup #exit").click(() => {
+$("#popup #exit, #popup-overlay").click(() => {
   console.log("closing popup");
   $("#popup-overlay, #popup").fadeOut(200);
 });

@@ -7,6 +7,7 @@ const cookieParser = require("cookie-parser");
 const rateLimit = require("express-rate-limit");
 const webpush = require("web-push");
 const { send } = require("process");
+const { parse } = require("path");
 
 const app = Express();
 
@@ -29,11 +30,22 @@ const sessionModel = mongoose.model("Session", {
   userAgent: String,
 });
 
+const notificationSchema = new mongoose.Schema({
+  heading: String,
+  text: String,
+  sendAt: { type: String, default: Date.now() },
+  type: {
+    type: String,
+    enum: ["love", "kiss", "message", "attention", "cuddle", "feeding"],
+  },
+});
+
 const userModel = mongoose.model("User", {
   person: { type: String, enum: ["vojtik", "hanca"] },
   lastCheckedCompliment: Number,
   lastSendCompliment: Number,
   dailyComplimentId: String,
+  notifications: [notificationSchema],
 });
 
 const complimentModel = mongoose.model("Compliment", {
@@ -166,18 +178,34 @@ app.get("/logout", async (req, res) => {
 let hancaSubscription;
 let vojtikSubscription;
 
-const sendNotificationToSO = (person, payload) => {
-  console.log(person);
-  if (person === "hanca" && vojtikSubscription) {
+const sendNotificationToSO = async (person, payload, type) => {
+  const parsedPayload = JSON.parse(payload);
+  if (person === "hanca") {
     console.log("Sending notification to Vojtik");
+    //Saving in db
+    const vojtikInDb = await userModel.findOne({ person: "vojtik" });
+    vojtikInDb.notifications.push({
+      type,
+      heading: parsedPayload.title,
+      text: parsedPayload.body,
+    });
+    await vojtikInDb.save();
     return webpush
       .sendNotification(vojtikSubscription, payload)
       .catch((err) => {
         console.error(err);
       });
   }
-  if (person === "vojtik" && hancaSubscription) {
+  if (person === "vojtik") {
     console.log("Sending notification to Hanča");
+    // Saving in db
+    const hancaInDb = await userModel.findOne({ person: "hanca" });
+    hancaInDb.notifications.push({
+      type,
+      heading: parsedPayload.title,
+      text: parsedPayload.body,
+    });
+    await hancaInDb.save();
     return webpush.sendNotification(hancaSubscription, payload).catch((err) => {
       console.error(err);
     });
@@ -452,10 +480,10 @@ const updateHomeAndUser = async (req, res, next) => {
           body: `You have finished sleeping and ready for adventure!`,
         });
         if (req.person === "hanca") {
-          sendNotificationToSO("hanca", payload);
+          sendNotificationToSO("vojtik", payload);
         }
         if (req.person === "vojtik") {
-          sendNotificationToSO("vojtik", payload);
+          sendNotificationToSO("hanca", payload);
         }
         user.isSleeping = false;
         user.lastSleepStart = undefined;
@@ -563,7 +591,7 @@ app.post("/api/home/feed", async (req, res) => {
         title: "Your Love is feeding you 🍔",
         body: "Your loving partner is giving you some food!",
       });
-      sendNotificationToSO(req.person, payload);
+      sendNotificationToSO(req.person, payload, "feeding");
     }
   }
   if (!objToFeed) {
@@ -690,7 +718,7 @@ app.post("/api/home/activity/:activity", async (req, res) => {
       title: "Love Action ❤️‍🔥",
       body: `Your partner ${req.userVH.name} wants to give you backshots!`,
     });
-    sendNotificationToSO(req.person, payload);
+    sendNotificationToSO(req.person, payload, "love");
     const rand = Math.random();
     if (rand < 0.1) {
       // 10% chance of no boner
@@ -785,7 +813,7 @@ app.post("/api/home/family/put-to-sleep", async (req, res) => {
   res.send({ success: true, tiredness: user.tiredness });
 });
 
-app.post("/api/home/send/:type", (req, res) => {
+app.post("/api/home/send/:type", async (req, res) => {
   const { type } = req.params;
   let payload;
   switch (type) {
@@ -817,55 +845,37 @@ app.post("/api/home/send/:type", (req, res) => {
       res.status(400).send({ error: "invalid type of send" });
   }
   console.log(payload);
-  sendNotificationToSO(req.person, payload);
+  sendNotificationToSO(req.person, payload, type);
   res.send({ success: true });
 });
 
-app.get("/api/home/update-data", async (req, res) => {
-  //Fill compliments with data
-  const newCompliments = [
-    "Seš moje nejvetší šikulka a strašně tě milujuuu. 💋",
-    "",
-  ];
-  const complimentsToSave = newCompliments.map((text) => {
-    return new complimentModel({
-      personTo: "hanca",
-      text,
-      createdAt: Date.now(),
-    });
-  });
-  await complimentModel.insertMany(complimentsToSave);
-  // Fill open cards with data
-  const newCards = [
-    {
-      heading: "Když se necítíš ve své kůži",
-      text: "Testing text",
-    },
-  ];
-  const cardsToSave = newCards.map((card) => {
-    return new openCardModel({
-      heading: card.heading,
-      text: card.text,
-    });
-  });
-  await openCardModel.insertMany(cardsToSave);
-  // Add bunny to pets
-  const bunny = new petsModel({
-    name: "Bunny",
-    type: "bunny",
-    hunger: 100,
-    cuddleNeed: 100,
-    playNeed: 100,
-  });
-  await bunny.save();
-  // rm all kids
-  await usersHomeModel.deleteMany({ isKid: true });
+app.delete("/api/home/notifications/:id", async (req, res) => {
+  const { id } = req.params;
+  // Find the notification by id from the logged-in user's notifications array
+  const user = req.user;
+  const notificationIndex = user.notifications.findIndex(
+    (n) => n._id.toString() === id
+  );
+  if (notificationIndex === -1) {
+    return res.status(404).send({ error: "Notification not found" });
+  }
+  user.notifications.splice(notificationIndex, 1);
+  await user.save();
+  res.send({ success: true });
 });
 
 app.get("/api/home/launch/launch", async (req, res) => {
   // Update all pets and users stats
   const users = await usersHomeModel.find();
+  const persons = await userModel.find();
   const pets = await petsModel.find();
+
+  persons.forEach((person) => {
+    person.dailyComplimentId = "";
+    person.lastCheckedCompliment = 0;
+    person.lastSendCompliment = 0;
+    person.notifications = [];
+  });
 
   users.forEach((user) => {
     user.hunger = 65;
@@ -892,6 +902,7 @@ app.get("/api/home/launch/launch", async (req, res) => {
   });
   usersHomeModel.bulkSave(users);
   petsModel.bulkSave(pets);
+  userModel.bulkSave(persons);
   res.send({
     success: true,
     message: "All pets and users stats updated",

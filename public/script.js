@@ -1,4 +1,5 @@
 let userPerson;
+let notifications;
 const loadContent = async () => {
   $.get("/api/home/current-user")
     .done((data) => {
@@ -57,6 +58,83 @@ const loadContent = async () => {
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("/sw.js");
     }
+
+    notifications = data.user.notifications;
+    console.log(notifications);
+    const lastNotificationId = localStorage.getItem("notify_id");
+    let notificationHTML;
+
+    if (
+      lastNotificationId === notifications[notifications.length - 1]._id ||
+      !notifications[notifications.length - 1]
+    ) {
+      //Last notification already seen
+      notificationHTML = `
+      <div class="no-notifications-container notification">
+      <div></div>
+      <div>
+      <h3>Nothing new here...</h3>
+      <button class="all-notifications-btn">All notifications</button>
+      </div>
+      </div>
+      `;
+    } else {
+      //New notification
+      const newNotification = notifications[notifications.length - 1];
+      const newNotificationDate = new Date(
+        Number(newNotification.sendAt)
+      ).toDateString();
+      localStorage.setItem("notify_id", newNotification._id);
+
+      let emoji = "";
+      let isMessage = false;
+      switch (newNotification.type) {
+        case "love":
+          emoji = "❤️";
+          break;
+        case "kiss":
+          emoji = "💋";
+          break;
+        case "message":
+          emoji = "💌";
+          isMessage = true;
+          break;
+        case "attention":
+          emoji = "👀";
+          break;
+        case "cuddle":
+          emoji = "🤗";
+          break;
+        case "feeding":
+          emoji = "🍽️";
+          break;
+        default:
+          emoji = "🔔";
+          break;
+      }
+      console.log(newNotification);
+      notificationHTML = `
+      <div class="notification">
+      <div class="emoji-container">${emoji}</div>
+      <div class="notification-info">
+      <h3>${newNotification.heading}</h3>
+      <p>${newNotification.text ? newNotification.text : ""}</p>
+      ${
+        isMessage
+          ? `
+        <div class="message-container">
+        <input class="message-input" placeholder="Reply"/>
+        <button class="send-message-btn" type='button'><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+        `
+          : ""
+      }
+      <p class="notification-time">${newNotificationDate}</p>
+      </div>
+      </div>
+      `;
+    }
+    $(".from-db-notif").html(notificationHTML);
 
     const lastCheckedComplimentDate = new Date(
       user.lastCheckedCompliment
@@ -144,7 +222,7 @@ $(".menu-container div").click(function () {
     console.log("Logging out...");
     $.get("/logout").done(() => {
       console.log("Logged out successfully.");
-      localStorage.removeItem("notificationPermission");
+      localStorage.clear();
       window.location.href = "/";
     });
     return;
@@ -154,4 +232,44 @@ $(".menu-container div").click(function () {
   } else {
     console.warn("No href attribute found for this menu item.");
   }
+});
+
+$(document).on("click", ".all-notifications-btn", () => {
+  const html = notifications.map((el) => {
+    let emoji = "";
+    switch (el.type) {
+      case "love":
+        emoji = "❤️";
+        break;
+      case "kiss":
+        emoji = "💋";
+        break;
+      case "message":
+        emoji = "💌";
+        break;
+      case "attention":
+        emoji = "👀";
+        break;
+      case "cuddle":
+        emoji = "🤗";
+        break;
+      case "feeding":
+        emoji = "🍽️";
+        break;
+      default:
+        emoji = "🔔";
+        break;
+    }
+    return `
+  <div class="notification">
+  <div class='emoji-container'>${emoji}</div>
+  <div class="notification-info">
+  <h3>${el.heading}</h3>
+  <p>${el.text}</p>
+  <p class="notification-time">${new Date(Number(el.sendAt)).toDateString()}</p>
+  </div>
+  </div>
+  `;
+  });
+  $(".from-db-notif").html(html);
 });
