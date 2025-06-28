@@ -7,6 +7,7 @@ const cookieParser = require("cookie-parser");
 const rateLimit = require("express-rate-limit");
 const webpush = require("web-push");
 const { send } = require("process");
+const { parse } = require("path");
 
 const app = Express();
 
@@ -178,33 +179,33 @@ let hancaSubscription;
 let vojtikSubscription;
 
 const sendNotificationToSO = async (person, payload, type) => {
-  console.log(person);
-  if (person === "hanca" && vojtikSubscription) {
+  const parsedPayload = JSON.parse(payload);
+  if (person === "hanca") {
     console.log("Sending notification to Vojtik");
     //Saving in db
     const vojtikInDb = await userModel.findOne({ person: "vojtik" });
     vojtikInDb.notifications.push({
       type,
-      heading: payload.title,
-      text: payload.body,
+      heading: parsedPayload.title,
+      text: parsedPayload.body,
     });
-    vojtikInDb.save();
+    await vojtikInDb.save();
     return webpush
       .sendNotification(vojtikSubscription, payload)
       .catch((err) => {
         console.error(err);
       });
   }
-  if (person === "vojtik" && hancaSubscription) {
+  if (person === "vojtik") {
     console.log("Sending notification to Hanča");
     // Saving in db
     const hancaInDb = await userModel.findOne({ person: "hanca" });
     hancaInDb.notifications.push({
       type,
-      heading: payload.title,
-      text: payload.body,
+      heading: parsedPayload.title,
+      text: parsedPayload.body,
     });
-    hancaInDb.save();
+    await hancaInDb.save();
     return webpush.sendNotification(hancaSubscription, payload).catch((err) => {
       console.error(err);
     });
@@ -866,7 +867,15 @@ app.delete("/api/home/notifications/:id", async (req, res) => {
 app.get("/api/home/launch/launch", async (req, res) => {
   // Update all pets and users stats
   const users = await usersHomeModel.find();
+  const persons = await userModel.find();
   const pets = await petsModel.find();
+
+  persons.forEach((person) => {
+    person.dailyComplimentId = "";
+    person.lastCheckedCompliment = 0;
+    person.lastSendCompliment = 0;
+    person.notifications = [];
+  });
 
   users.forEach((user) => {
     user.hunger = 65;
@@ -893,6 +902,7 @@ app.get("/api/home/launch/launch", async (req, res) => {
   });
   usersHomeModel.bulkSave(users);
   petsModel.bulkSave(pets);
+  userModel.bulkSave(persons);
   res.send({
     success: true,
     message: "All pets and users stats updated",
