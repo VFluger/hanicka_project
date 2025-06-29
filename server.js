@@ -928,7 +928,7 @@ app.get("/api/home/launch/launch", async (req, res) => {
 
 app.get("/api/home/update/update", (req, res) => {
   //Fill the compliments db with data
-  const compliments = ["You have the most beautiful voice in the world! 🌎"];
+  const compliments = [];
   compliments.forEach((comp) => {
     const obj = new complimentModel({
       personTo: "hanca",
@@ -938,21 +938,22 @@ app.get("/api/home/update/update", (req, res) => {
     obj.save();
   });
 
-  //Fill open when cards db with data
-  const cards = [
-    {
-      heading: "Open when you miss me",
-      text: "Remember all the wonderful moments we've shared together. I'm always with you in spirit, even when we're apart.",
-    },
-  ];
+  // //Fill open when cards db with data
+  // const cards = [
+  //   {
+  //     heading: "Open when you miss me",
+  //     text: "Remember all the wonderful moments we've shared together. I'm always with you in spirit, even when we're apart.",
+  //   },
+  // ];
 
-  cards.forEach((card) => {
-    const obj = new openCardModel({
-      heading: card.heading,
-      text: card.text,
-    });
-    obj.save();
-  });
+  // cards.forEach((card) => {
+  //   const obj = new openCardModel({
+  //     heading: card.heading,
+  //     text: card.text,
+  //   });
+  //   obj.save();
+  //});
+  return res.send({ success: true });
 });
 
 const server = app.listen(process.env.PORT || "8080", () => {

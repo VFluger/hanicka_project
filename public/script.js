@@ -114,7 +114,7 @@ const loadContent = async () => {
       }
       console.log(newNotification);
       notificationHTML = `
-      <div class="notification">
+      <div class="notification" data-id=${newNotification._id}>
       <div class="emoji-container">${emoji}</div>
       <div class="notification-info">
       <h3>${newNotification.heading}</h3>
@@ -129,6 +129,9 @@ const loadContent = async () => {
         `
           : ""
       }
+      <button class="delete-notification-btn">
+      <i class="fas fa-times"></i>
+      </button>
       <p class="notification-time">${newNotificationDate}</p>
       </div>
       </div>
@@ -175,6 +178,22 @@ $(document).on("keydown", ".message-input", (e) => {
   if (e.key === "Enter") {
     sendMessage();
   }
+});
+
+$(document).on("click", ".delete-notification-btn", function () {
+  const notificationId = $(this).parent().parent().data("id");
+  $.ajax({
+    url: `/api/home/notifications/${notificationId}`,
+    type: "DELETE",
+    success: function (result) {
+      // Remove the notification from the DOM
+      $(`.notification[data-id='${notificationId}']`).remove();
+    },
+    error: function (xhr) {
+      alert("Failed to delete notification.");
+      console.error(xhr.responseJSON || xhr);
+    },
+  });
 });
 
 $(".expand-heading").click(function () {
@@ -284,12 +303,15 @@ $(document).on("click", ".all-notifications-btn", () => {
         break;
     }
     return `
-  <div class="notification">
+  <div class="notification" data-id=${el._id}>
   <div class='emoji-container'>${emoji}</div>
   <div class="notification-info">
   <h3>${el.heading}</h3>
   <p>${el.text}</p>
   <p class="notification-time">${new Date(Number(el.sendAt)).toDateString()}</p>
+  <button class="delete-notification-btn">
+      <i class="fas fa-times"></i>
+      </button>
   </div>
   </div>
   `;
