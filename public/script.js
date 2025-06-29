@@ -132,6 +132,7 @@ const loadContent = async () => {
       <p class="notification-time">${newNotificationDate}</p>
       </div>
       </div>
+      <button class="all-notifications-btn">All notifications</button>
       `;
     }
     $(".from-db-notif").html(notificationHTML);
@@ -153,6 +154,28 @@ const loadContent = async () => {
   $("compliment-btn").hide();
 };
 loadContent();
+
+const sendMessage = () => {
+  const message = $(".message-input").val();
+  $.post("/api/home/send/message", { message })
+    .done((data) => {
+      console.log(data);
+      if (!data.success) {
+        alert("An error occured and the message wasn't send");
+        return;
+      }
+      $(".message-input").val("");
+      $(".send-message-btn").html(`<i class="fa-solid fa-check"></i>`);
+    })
+    .fail((xhr) => console.error(xhr.responseJSON));
+};
+
+$(document).on("click", ".send-message-btn", sendMessage);
+$(document).on("keydown", ".message-input", (e) => {
+  if (e.key === "Enter") {
+    sendMessage();
+  }
+});
 
 $(".expand-heading").click(function () {
   $(this).find("i").toggleClass("down");

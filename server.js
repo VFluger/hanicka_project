@@ -178,19 +178,33 @@ app.get("/logout", async (req, res) => {
 });
 
 const sendNotificationToSO = async (person, payload, type) => {
-  const parsedPayload = JSON.parse(payload);
+  let parsedPayload;
+  let parsedSub;
   if (person === "hanca") {
     console.log("Sending notification to Vojtik");
     //Saving in db
     const vojtikInDb = await userModel.findOne({ person: "vojtik" });
+    //Parsing JSON with try to not crash server
+    try {
+      parsedPayload = JSON.parse(payload);
+      parsedSub = JSON.parse(vojtikInDb.notificationSub);
+    } catch (err) {
+      console.error(err);
+    }
+    //Pushing new notification to db
     vojtikInDb.notifications.push({
       type,
       heading: parsedPayload.title,
       text: parsedPayload.body,
     });
     await vojtikInDb.save();
+    //If isnt subscribed, return
+    if (!parsedSub) {
+      return;
+    }
+    //Sending push notify to user
     return webpush
-      .sendNotification(vojtikInDb.notificationSub, payload)
+      .sendNotification(JSON.parse(vojtikInDb.notificationSub), payload)
       .catch((err) => {
         console.error(err);
       });
@@ -199,14 +213,25 @@ const sendNotificationToSO = async (person, payload, type) => {
     console.log("Sending notification to Hanča");
     // Saving in db
     const hancaInDb = await userModel.findOne({ person: "hanca" });
+    // Same as above just for hanca
+    try {
+      parsedPayload = JSON.parse(payload);
+      parsedSub = JSON.parse(hancaInDb.notificationSub);
+    } catch (err) {
+      console.error(err);
+    }
     hancaInDb.notifications.push({
       type,
       heading: parsedPayload.title,
       text: parsedPayload.body,
     });
     await hancaInDb.save();
+    //If isnt subscribed, return
+    if (!parsedSub) {
+      return;
+    }
     return webpush
-      .sendNotification(hancaInDb.notificationSub, payload)
+      .sendNotification(JSON.parse(hancaInDb.notificationSub), payload)
       .catch((err) => {
         console.error(err);
       });
@@ -215,15 +240,16 @@ const sendNotificationToSO = async (person, payload, type) => {
 
 //Notification subscribe
 app.post("/subscribe-hanca", async (req, res) => {
-  const hancaInDb = await userModel.find({ person: "hanca" });
-  hancaInDb.notificationSub = req.body;
+  const hancaInDb = await userModel.findOne({ person: "hanca" });
+  console.log(req.body);
+  hancaInDb.notificationSub = JSON.stringify(req.body);
   hancaInDb.save();
   res.status(201).json({});
 });
 
 app.post("/subscribe-vojtik", async (req, res) => {
   const vojtikInDb = await userModel.find({ person: "vojtik" });
-  vojtikInDb.notificationSub = req.body;
+  vojtikInDb.notificationSub = JSON.stringify(req.body);
   vojtikInDb.save();
   res.status(201).json({});
 });

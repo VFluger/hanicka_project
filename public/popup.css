@@ -20,6 +20,7 @@
   width: 50vw;
   padding: 20px;
   max-height: 80vh;
+  max-width: 90%;
   overflow-y: auto;
   background: var(--bg-light-color);
   color: white;
