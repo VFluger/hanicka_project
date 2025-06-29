@@ -6,9 +6,6 @@ require("dotenv").config();
 const cookieParser = require("cookie-parser");
 const rateLimit = require("express-rate-limit");
 const webpush = require("web-push");
-const { send } = require("process");
-const { parse } = require("path");
-
 const app = Express();
 
 const publicVapidKey = process.env.PUBLIC_VAPID_KEY;
@@ -46,6 +43,7 @@ const userModel = mongoose.model("User", {
   lastSendCompliment: Number,
   dailyComplimentId: String,
   notifications: [notificationSchema],
+  notificationSub: String,
 });
 
 const complimentModel = mongoose.model("Compliment", {
@@ -82,7 +80,7 @@ const usersHomeModel = mongoose.model("VHUsers", {
   lastSleepStart: { type: Number, default: Date.now }, // When the user sleep is starting
   lastSleepEnd: { type: Number }, // When the user sleep is ending
   tirednessRecoveredDuringSleep: { type: Number, default: 0 },
-  isKid: { type: Boolean, default: false }, // If true, user is kid (no real user)
+  isKid: { type: Boolean, default: false }, // If true, user is kid (not real user)
 });
 
 const foodModel = mongoose.model("VHFood", {
@@ -92,7 +90,7 @@ const foodModel = mongoose.model("VHFood", {
 });
 
 // Basic middleware
-app.use((req, res, next) => {
+app.use("/api", (req, res, next) => {
   console.log(`${req.method} ON ${req.url}`);
   next();
 });
@@ -103,6 +101,7 @@ app.use(cookieParser());
 app.use("/", Express.static(__dirname + "/views/"));
 app.use("/", Express.static(__dirname + "/public/"));
 
+//AUTHENTICATION
 app.use("/api", async (req, res, next) => {
   //cookie auth
   const token = req.cookies.sesstoken;
@@ -121,7 +120,6 @@ app.use("/api", async (req, res, next) => {
 
 app.post("/login", async (req, res) => {
   const { person, password } = req.body;
-  console.log(person, password);
 
   const setCookie = async () => {
     // Hint cookie
@@ -135,7 +133,7 @@ app.post("/login", async (req, res) => {
     const sessionObj = new sessionModel({
       token,
       ip: req.ip,
-      person: person,
+      person,
       userAgent: req.headers["user-agent"],
     });
     if (req.cookies.sesstoken) {
@@ -147,7 +145,7 @@ app.post("/login", async (req, res) => {
         await sessionModel.findOneAndDelete({ _id: oldSessInDb["_id"] });
       }
     }
-    const sessionObjInDb = await sessionObj.save();
+    await sessionObj.save();
     res.cookie("sesstoken", token, {
       maxAge: oneYear,
       httpOnly: true,
@@ -157,13 +155,16 @@ app.post("/login", async (req, res) => {
 
   if (person === "hanca" && password === process.env.HANCA) {
     await setCookie();
+    console.log("Successful login for hanca");
     return res.send({ success: true });
   }
 
   if (person === "vojtik" && password === process.env.VOJTIK) {
     await setCookie();
+    console.log("Successful login for vojtik ");
     return res.send({ success: true });
   }
+  console.log("Incorrect login");
   return res.status(400).send({ error: "Incorrect password" });
 });
 
@@ -175,8 +176,6 @@ app.get("/logout", async (req, res) => {
   }
   res.status(500).send({ error: "internal server error" });
 });
-let hancaSubscription;
-let vojtikSubscription;
 
 const sendNotificationToSO = async (person, payload, type) => {
   const parsedPayload = JSON.parse(payload);
@@ -191,7 +190,7 @@ const sendNotificationToSO = async (person, payload, type) => {
     });
     await vojtikInDb.save();
     return webpush
-      .sendNotification(vojtikSubscription, payload)
+      .sendNotification(vojtikInDb.notificationSub, payload)
       .catch((err) => {
         console.error(err);
       });
@@ -206,20 +205,26 @@ const sendNotificationToSO = async (person, payload, type) => {
       text: parsedPayload.body,
     });
     await hancaInDb.save();
-    return webpush.sendNotification(hancaSubscription, payload).catch((err) => {
-      console.error(err);
-    });
+    return webpush
+      .sendNotification(hancaInDb.notificationSub, payload)
+      .catch((err) => {
+        console.error(err);
+      });
   }
 };
 
 //Notification subscribe
-app.post("/subscribe-hanca", (req, res) => {
-  hancaSubscription = req.body;
+app.post("/subscribe-hanca", async (req, res) => {
+  const hancaInDb = await userModel.find({ person: "hanca" });
+  hancaInDb.notificationSub = req.body;
+  hancaInDb.save();
   res.status(201).json({});
 });
 
-app.post("/subscribe-vojtik", (req, res) => {
-  vojtikSubscription = req.body;
+app.post("/subscribe-vojtik", async (req, res) => {
+  const vojtikInDb = await userModel.find({ person: "vojtik" });
+  vojtikInDb.notificationSub = req.body;
+  vojtikInDb.save();
   res.status(201).json({});
 });
 
@@ -238,7 +243,6 @@ app.get("/api/compliment", async (req, res) => {
     const complimentObj = await complimentModel.findById(
       user.dailyComplimentId
     );
-    console.log(complimentObj);
     return res.send({
       success: true,
       compliment: complimentObj,
@@ -265,7 +269,6 @@ app.get("/api/compliment", async (req, res) => {
 });
 
 app.post("/api/compliment", async (req, res) => {
-  console.log(req.body);
   const user = req.user;
   const lastPostedOn = new Date(user.lastSendCompliment);
   if (lastPostedOn.getDay() === new Date().getDay()) {
@@ -293,6 +296,7 @@ app.post("/api/compliment", async (req, res) => {
       req.person === "hanca" ? "Hanča" : "Vojtík"
     }!`,
   });
+  console.log("New compliment posted");
   sendNotificationToSO(user.person, payload);
   res.send({ success: true });
 });
@@ -310,7 +314,6 @@ app.post("/api/compliment/reaction", async (req, res) => {
   const { complimentId, reaction } = req.body;
   //get compliment by id
   const compliment = await complimentModel.findById(complimentId);
-  console.log(compliment);
   let hasAlreadyReaction = false;
   //if reaction present, replace
   if (compliment.reaction) {
@@ -331,6 +334,7 @@ app.post("/api/compliment/reaction", async (req, res) => {
     }!`,
   });
   sendNotificationToSO(compliment.personTo, payload);
+  console.log("New reaction posted");
   return res.send({ success: true, reaction, hasAlreadyReaction });
 });
 
@@ -369,15 +373,12 @@ app.get("/api/card", async (req, res) => {
 // update fnc (update hunger and other stats)
 // /api/home/update
 const updateHomeAndUser = async (req, res, next) => {
-  console.log(req.user);
   if (req.user.person === "hanca") {
     const userVH = await usersHomeModel.findOne({ name: "Hanča" });
-    console.log("UserVH: ", userVH);
     req.userVH = userVH;
   }
   if (req.user.person === "vojtik") {
     const userVH = await usersHomeModel.findOne({ name: "Vojtík" });
-    console.log("UserVH: ", userVH);
     req.userVH = userVH;
   }
   // Get all pets and users
@@ -396,7 +397,6 @@ const updateHomeAndUser = async (req, res, next) => {
     ); // in tens of minutes
 
     if (timeSinceLastHungerUpdate > 0) {
-      console.log(`${pet.name} Hunger descrease: `, timeSinceLastHungerUpdate);
       pet.hunger -= timeSinceLastHungerUpdate;
       pet.lastHungerUpdate = Date.now();
       if (pet.hunger < 0) {
@@ -404,10 +404,6 @@ const updateHomeAndUser = async (req, res, next) => {
       }
     }
     if (timeSinceLastCuddleUpdate > 0) {
-      console.log(
-        `${pet.name} CuddleNeed descrease: `,
-        timeSinceLastCuddleUpdate
-      );
       pet.cuddleNeed -= timeSinceLastCuddleUpdate * 2; // 2% per 10 minutes
       pet.lastCuddleUpdate = Date.now();
       if (pet.cuddleNeed < 0) {
@@ -415,7 +411,6 @@ const updateHomeAndUser = async (req, res, next) => {
       }
     }
     if (timeSinceLastPlayUpdate > 0) {
-      console.log(`${pet.name} PlayNeed descrease: `, timeSinceLastPlayUpdate);
       pet.playNeed -= timeSinceLastPlayUpdate * 2; // 2% per 10 minutes
       pet.lastPlayUpdate = Date.now();
       if (pet.playNeed < 0) {
@@ -435,7 +430,6 @@ const updateHomeAndUser = async (req, res, next) => {
     ); // in tens of minutes
 
     if (timeSinceLastHungerUpdate > 0) {
-      console.log(`${user.name} Hunger descrease: `, timeSinceLastHungerUpdate);
       user.hunger -= timeSinceLastHungerUpdate;
       user.lastHungerUpdate = Date.now();
       if (user.hunger < 0) {
@@ -443,10 +437,6 @@ const updateHomeAndUser = async (req, res, next) => {
       }
     }
     if (timeSinceLastTirednessUpdate > 0) {
-      console.log(
-        `${user.name} Tiredness increase: `,
-        timeSinceLastTirednessUpdate
-      );
       user.tiredness += timeSinceLastTirednessUpdate;
       user.lastTirednessUpdate = Date.now();
       if (user.tiredness > 100) {
@@ -529,7 +519,6 @@ app.get("/api/home/:objToGet", async (req, res) => {
 
 app.post("/api/home/change/rename", async (req, res) => {
   const { id, name, type } = req.body;
-  console.log("REQUEST BODY: ", req.body);
   if (!id || !name || !type) {
     return res.status(400).send({ error: "Missing parameters" });
   }
@@ -699,7 +688,6 @@ app.post("/api/home/activity/:activity", async (req, res) => {
 
   // TV: instant action, tiredness goes down by 15%
   if (activity === "tv") {
-    console.log("tv");
     req.userVH.tiredness -= 15;
     if (req.userVH.tiredness < 0) {
       req.userVH.tiredness = 0;
@@ -903,9 +891,41 @@ app.get("/api/home/launch/launch", async (req, res) => {
   usersHomeModel.bulkSave(users);
   petsModel.bulkSave(pets);
   userModel.bulkSave(persons);
+
+  await usersHomeModel.deleteMany({ isKid: true });
+
   res.send({
     success: true,
     message: "All pets and users stats updated",
+  });
+});
+
+app.get("/api/home/update/update", (req, res) => {
+  //Fill the compliments db with data
+  const compliments = ["You have the most beautiful voice in the world! 🌎"];
+  compliments.forEach((comp) => {
+    const obj = new complimentModel({
+      personTo: "hanca",
+      createdAt: Date.now(),
+      text: comp,
+    });
+    obj.save();
+  });
+
+  //Fill open when cards db with data
+  const cards = [
+    {
+      heading: "Open when you miss me",
+      text: "Remember all the wonderful moments we've shared together. I'm always with you in spirit, even when we're apart.",
+    },
+  ];
+
+  cards.forEach((card) => {
+    const obj = new openCardModel({
+      heading: card.heading,
+      text: card.text,
+    });
+    obj.save();
   });
 });
 
