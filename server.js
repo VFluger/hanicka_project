@@ -792,6 +792,9 @@ app.post("/api/home/activity/:activity", async (req, res) => {
     if (req.userVH.tiredness > 100) {
       req.userVH.tiredness = 100;
     }
+    if (req.userVH.tiredness < 0) {
+      req.userVH.tiredness = 0;
+    }
     // Add food to db
     const food = new foodModel({
       name: foodType,
@@ -885,10 +888,10 @@ app.get("/api/home/launch/launch", async (req, res) => {
   const pets = await petsModel.find();
 
   persons.forEach((person) => {
-    person.dailyComplimentId = "";
     person.lastCheckedCompliment = 0;
     person.lastSendCompliment = 0;
     person.notifications = [];
+    person.notificationSub = "";
   });
 
   users.forEach((user) => {
