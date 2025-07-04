@@ -286,6 +286,13 @@ const draggableUpdate = () => {
     .on("contextmenu", (e) => e.preventDefault());
 };
 
+const getTouchPosition = (e) => {
+  return {
+    x: e.type.startsWith("touch") ? e.touches[0].clientX : e.clientX,
+    y: e.type.startsWith("touch") ? e.touches[0].clientY : e.clientY,
+  };
+};
+
 const redbullMiniGame = () => {
   $(".food-to-make-container").html("");
   $("#popup .heading").text("Drag the card to pay");
@@ -308,18 +315,26 @@ const redbullMiniGame = () => {
   let cardInserted = false;
   let offset = { x: 0, y: 0 };
 
-  $card.on("mousedown", function (e) {
+  $card.on("mousedowntouchstart", function (e) {
     isDragging = true;
     const containerOffset = $(".food-to-make-container").offset();
-    offset.x = e.clientX - containerOffset.left - $card.position().left;
-    offset.y = e.clientY - containerOffset.top - $card.position().top;
+    offset.x =
+      getTouchPosition(e).x - containerOffset.left - $card.position().left;
+    offset.y =
+      getTouchPosition(e).y - containerOffset.top - $card.position().top;
     $card.css("position", "absolute"); // Make sure it's movable
   });
 
-  $(document).on("mousemove", function (e) {
+  $(document).on("mousemove touchmove", function (e) {
     if (!isDragging) return;
-    let x = e.clientX - $(".food-to-make-container").offset().left - offset.x;
-    let y = e.clientY - $(".food-to-make-container").offset().top - offset.y;
+    let x =
+      getTouchPosition(e).x -
+      $(".food-to-make-container").offset().left -
+      offset.x;
+    let y =
+      getTouchPosition(e).y -
+      $(".food-to-make-container").offset().top -
+      offset.y;
     $card.css({ left: x + "px", top: y + "px" });
 
     // Collision detection
@@ -351,7 +366,7 @@ const redbullMiniGame = () => {
     }
   });
 
-  $(document).on("mouseup", function () {
+  $(document).on("mouseup touchend", function () {
     isDragging = false;
   });
 };
@@ -388,22 +403,30 @@ const pizzaMiniGame = () => {
   let $DraggingCard = "";
   let offset = { x: 0, y: 0 };
 
-  $topings.on("mousedown", function (e) {
+  $topings.on("mousedown touchstart", function (e) {
     $DraggingCard = $(this);
     const containerOffset = $("#minigame-container").offset();
-    offset.x = e.clientX - containerOffset.left - $(this).position().left;
-    offset.y = e.clientY - containerOffset.top - $(this).position().top;
+    offset.x =
+      getTouchPosition(e).x - containerOffset.left - $(this).position().left;
+    offset.y =
+      getTouchPosition(e).y - containerOffset.top - $(this).position().top;
     $(this).css("position", "absolute"); // Make sure it's movable
   });
 
-  $(document).on("mousemove", function (e) {
+  $(document).on("mousemove touchmove", function (e) {
     if (!$DraggingCard) return;
-    let x = e.clientX - $(".food-to-make-container").offset().left - offset.x;
-    let y = e.clientY - $(".food-to-make-container").offset().top - offset.y;
+    let x =
+      getTouchPosition(e).x -
+      $(".food-to-make-container").offset().left -
+      offset.x;
+    let y =
+      getTouchPosition(e).y -
+      $(".food-to-make-container").offset().top -
+      offset.y;
     $DraggingCard.css({ left: x + "px", top: y + "px" });
   });
 
-  $(document).on("mouseup", function () {
+  $(document).on("mouseup touchend", function () {
     $DraggingCard = "";
   });
   $(document).on("click", "#pizza-btn", function () {
@@ -434,18 +457,22 @@ const twisterMiniGame = () => {
   let isTouchingNow = false;
   let offset = { x: 0, y: 0 };
 
-  $head.on("mousedown", function (e) {
+  $head.on("mousedown touchstart", function (e) {
     isDragging = true;
     const containerOffset = $("#minigame-container").offset();
-    offset.x = e.clientX - containerOffset.left - $head.position().left;
-    offset.y = e.clientY - containerOffset.top - $head.position().top;
+    offset.x =
+      getTouchPosition(e).x - containerOffset.left - $head.position().left;
+    offset.y =
+      getTouchPosition(e).y - containerOffset.top - $head.position().top;
     $head.css("position", "absolute"); // Make sure it's movable
   });
 
-  $(document).on("mousemove", function (e) {
+  $(document).on("mousemove touchmove", function (e) {
     if (!isDragging) return;
-    let x = e.clientX - $("#minigame-container").offset().left - offset.x;
-    let y = e.clientY - $("#minigame-container").offset().top - offset.y;
+    let x =
+      getTouchPosition(e).x - $("#minigame-container").offset().left - offset.x;
+    let y =
+      getTouchPosition(e).y - $("#minigame-container").offset().top - offset.y;
     $head.css({ left: x + "px", top: y + "px" });
 
     // Collision detection
@@ -481,7 +508,7 @@ const twisterMiniGame = () => {
     }
   });
 
-  $(document).on("mouseup", function () {
+  $(document).on("mouseup touchend", function () {
     isDragging = false;
   });
 };
@@ -507,18 +534,22 @@ const soupMiniGame = () => {
   let lastRect = { x: 0, y: 0 };
   let offset = { x: 0, y: 0 };
 
-  $spoon.on("mousedown", function (e) {
+  $spoon.on("mousedown touchstart", function (e) {
     isDragging = true;
     const containerOffset = $("#minigame-container").offset();
-    offset.x = e.clientX - containerOffset.left - $spoon.position().left;
-    offset.y = e.clientY - containerOffset.top - $spoon.position().top;
+    offset.x =
+      getTouchPosition(e).x - containerOffset.left - $spoon.position().left;
+    offset.y =
+      getTouchPosition(e).y - containerOffset.top - $spoon.position().top;
     $spoon.css("position", "absolute"); // Make sure it's movable
   });
 
-  $(document).on("mousemove", function (e) {
+  $(document).on("mousemove touchmove", function (e) {
     if (!isDragging) return;
-    let x = e.clientX - $("#minigame-container").offset().left - offset.x;
-    let y = e.clientY - $("#minigame-container").offset().top - offset.y;
+    let x =
+      getTouchPosition(e).x - $("#minigame-container").offset().left - offset.x;
+    let y =
+      getTouchPosition(e).y - $("#minigame-container").offset().top - offset.y;
     $spoon.css({ left: x + "px", top: y + "px" });
 
     // Collision detection
@@ -536,12 +567,12 @@ const soupMiniGame = () => {
 
     if (isTouching) {
       // Collision just started
-      const differenceX = Math.abs(e.clientX - lastRect.x);
-      const differenceY = Math.abs(e.clientY - lastRect.y);
+      const differenceX = Math.abs(getTouchPosition(e).x - lastRect.x);
+      const differenceY = Math.abs(getTouchPosition(e).y - lastRect.y);
       const difference = differenceX + differenceY;
       if (difference !== 0 || difference >= 0) {
-        lastRect.x = e.clientX;
-        lastRect.y = e.clientY;
+        lastRect.x = getTouchPosition(e).x;
+        lastRect.y = getTouchPosition(e).y;
         touchDistance = touchDistance + difference;
         console.log("Touch Distance: ", touchDistance / window.screen.width);
       }
@@ -553,7 +584,7 @@ const soupMiniGame = () => {
     }
   });
 
-  $(document).on("mouseup", function () {
+  $(document).on("mouseup touchend", function () {
     isDragging = false;
   });
 };
