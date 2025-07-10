@@ -1,3 +1,16 @@
+let cards;
+const renderCards = (cardsToRender) => {
+  const htmlMap = cardsToRender.map((el) => {
+    return `
+        <div class="card ${el.seen ? "seen" : ""}" id='${el._id}'>
+        <h2 class="heading">${el.heading}</h2>
+        <p class="text-card"></p>
+        <div class="close"><i class="fa-solid fa-xmark"></i></div>
+        </div>
+        `;
+  });
+  $(".cards-container").html(htmlMap);
+};
 const loadContent = () => {
   $.get("/api/all-cards")
     .done((data) => {
@@ -5,17 +18,8 @@ const loadContent = () => {
       if (!data.success) {
         return $(".cards-container").text("Error occured: ", data);
       }
-      const htmlMap = data.cards.map((el) => {
-        console.log(el);
-        return `
-        <div class="card ${el.seen ? "seen" : ""}" id='${el._id}'>
-        <h2 class="heading">${el.heading}</h2>
-        <p class="text-card"></p>
-        <div class="close"><i class="fa-solid fa-xmark"></i></div>
-        </div>
-        `;
-      });
-      $(".cards-container").html(htmlMap);
+      cards = data.cards;
+      renderCards(data.cards);
 
       //Open card
       $(".card").click(function () {
@@ -56,3 +60,11 @@ const loadContent = () => {
     });
 };
 loadContent();
+
+$("#search").on("input", function (e) {
+  const currentVal = $(this).val();
+  // Get the filtered cards
+  const filteredCards = cards.filter((el) => el.heading.includes(currentVal));
+  //Rerender cards
+  renderCards(filteredCards);
+});

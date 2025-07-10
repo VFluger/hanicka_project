@@ -931,31 +931,26 @@ app.get("/api/home/launch/launch", async (req, res) => {
 
 app.get("/api/home/update/update", (req, res) => {
   //Fill the compliments db with data
-  const compliments = [];
-  compliments.forEach((comp) => {
-    const obj = new complimentModel({
-      personTo: "hanca",
-      createdAt: Date.now(),
-      text: comp,
+  // const compliments = [];
+  // compliments.forEach((comp) => {
+  //   const obj = new complimentModel({
+  //     personTo: "hanca",
+  //     createdAt: Date.now(),
+  //     text: comp,
+  //   });
+  //   obj.save();
+  // });
+
+  // //Fill open when cards db with data
+  const cards = [];
+
+  cards.forEach((card) => {
+    const obj = new openCardModel({
+      heading: card.heading,
+      text: card.text,
     });
     obj.save();
   });
-
-  // //Fill open when cards db with data
-  // const cards = [
-  //   {
-  //     heading: "Open when you miss me",
-  //     text: "Remember all the wonderful moments we've shared together. I'm always with you in spirit, even when we're apart.",
-  //   },
-  // ];
-
-  // cards.forEach((card) => {
-  //   const obj = new openCardModel({
-  //     heading: card.heading,
-  //     text: card.text,
-  //   });
-  //   obj.save();
-  //});
   return res.send({ success: true });
 });
 
