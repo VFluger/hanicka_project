@@ -933,6 +933,20 @@ app.get("/api/home/launch/launch", async (req, res) => {
   });
 });
 
+app.get("/api/home/update/update", async (req, res) => {
+  notificationSchema;
+  const newNotify = {
+    heading: "test notification",
+    text: "testing description",
+    type: "kiss",
+  };
+  const allUsers = await userModel.find({ isKid: false });
+  allUsers.forEach((user) => {
+    user.notifications.push(newNotify);
+  });
+  userModel.bulkSave(allUsers);
+});
+
 const server = app.listen(process.env.PORT || "8080", () => {
   console.log(`listening on port ${server.address().port}`);
 });

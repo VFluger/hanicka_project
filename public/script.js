@@ -60,7 +60,7 @@ const loadContent = async () => {
     }
 
     notifications = data.user.notifications;
-    console.log(notifications);
+    console.log("Notifications: ", notifications);
     const lastNotificationId = localStorage.getItem("notify_id");
     let notificationHTML;
 
