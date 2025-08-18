@@ -96,8 +96,11 @@ h2 {
 }
 
 .text-card {
-  font-size: 2em;
-  padding: 0 50px;
+  font-size: 1.5em;
+  padding: 0 20px; /* optional: reduce side padding */
+  max-height: 90vh; /* limits height to 60% of viewport */
+  overflow-y: auto; /* scroll only if content exceeds max-height */
+  overflow-x: hidden; /* prevent horizontal scroll */
 }
 
 #cards-overlay.active {
